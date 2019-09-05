@@ -1,0 +1,57 @@
+mat-card{
+  margin: 20px;
+}
+  
+
+.app-category-list-invisible {
+  display: none;
+}
+
+.app-category-list ul,
+
+.app-category-list li {
+  margin-top: 0;
+  margin-bottom: 0;
+  list-style-type: none;
+}
+
+.app-category-list-description{
+  font-style: italic;
+  color: grey;
+  font-size: smaller;
+}
+
+.drop-above {
+  border-top: 10px solid #dddddd;
+  margin-top: -10px;
+}
+
+.drop-below {
+  border-bottom: 10px solid #dddddd;
+  margin-bottom: -10px;
+}
+
+.drop-center {
+  background-color: #dddddd;
+}
+
+.mat-tree-node label{
+  cursor: grab;
+  padding: 5px;  
+}
+
+.mat-tree-node:hover{
+  background: gainsboro;
+}
+
+.mat-tree-node label:hover
+{
+  transition: all 1s;  
+  font-weight: bold;
+  
+}
+
+.button-row button,
+.button-row a {
+  margin-right: 8px;
+}

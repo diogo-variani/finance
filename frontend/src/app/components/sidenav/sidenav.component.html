@@ -1,0 +1,73 @@
+<mat-sidenav-container class="finance-container">
+
+  <mat-sidenav #sidenav class="finance-sidenav mat-elevation-z10" [opened]="!isScreenSmall()"
+    [mode]="isScreenSmall() ? 'over': 'side'">
+    <mat-toolbar color="primary">
+      Menu
+    </mat-toolbar>
+
+    <mat-list>
+
+      <mat-list-item routerLink='/'>
+        <mat-icon matListIcon>home</mat-icon>
+        <h3 matLine>Home</h3>
+      </mat-list-item>
+
+      <mat-divider></mat-divider>
+
+      <h3 matSubheader>Configuration</h3>
+
+      <mat-list-item routerLink='/categories'>
+        <mat-icon matListIcon>local_offer</mat-icon>
+        <h3 matLine>Categories</h3>
+      </mat-list-item>
+
+      <mat-list-item routerLink='/bankAccounts'>
+        <mat-icon matListIcon>account_balance</mat-icon>
+        <h3 matLine>Bank Accounts</h3>
+      </mat-list-item>
+
+      <mat-list-item routerLink='/creditCards'>
+        <mat-icon matListIcon>credit_card</mat-icon>
+        <h3 matLine>Credit Cards</h3>
+      </mat-list-item>
+
+      <mat-divider></mat-divider>
+      <h3 matSubheader>Movements</h3>
+
+      <mat-list-item routerLink='/movements'>
+        <mat-icon matListIcon>monetization_on</mat-icon>
+        <h3 matLine>Movements</h3>
+      </mat-list-item>
+      
+      <mat-list-item routerLink='/bulk'>
+        <mat-icon matListIcon>insert_drive_file</mat-icon>
+        <h3 matLine>Upload File</h3>
+      </mat-list-item>      
+
+      <mat-divider></mat-divider>
+      <h3 matSubheader>Reports</h3>
+
+      <mat-list-item>
+        <mat-icon matListIcon>account_balance_wallet</mat-icon>
+        <h3 matLine>Balance</h3>
+      </mat-list-item>
+
+      <mat-list-item>
+        <mat-icon matListIcon>style</mat-icon>
+        <h3 matLine>Categories</h3>
+      </mat-list-item>      
+
+
+
+    </mat-list>
+  </mat-sidenav>
+
+  <mat-sidenav-content class="finance-content">
+    <app-toolbar (toggleSidenav)="sidenav.toggle()"></app-toolbar>
+    <div class="wrapper">
+      <router-outlet></router-outlet>
+    </div>
+  </mat-sidenav-content>
+
+</mat-sidenav-container>

@@ -1,0 +1,43 @@
+mat-card {
+  margin: 20px;
+}
+
+table {
+  width: 100%;
+}
+
+.filterDescription{
+  float: left;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  max-width: 85%;
+  display: block;
+  margin: 6px 0px 0px 0;
+  padding: 0 0 10px 0;
+
+  @media (max-width: 720px) {
+    max-width: 100%;
+  }
+}
+
+.showDetails{
+  float: right;
+  padding: 0 0 10px 0;
+  display: none;
+  @media (min-width: 1200px) {
+    display: inline-block;
+  }
+}
+
+tr.mat-footer-row {
+  font-weight: bold;
+}
+
+.credit{
+  color: cornflowerblue;
+}
+
+.debit{
+  color: red;
+}

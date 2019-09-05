@@ -1,0 +1,118 @@
+<!-- https://github.com/AngularTemplates/angular-forms-and-validations/blob/master/src/app/forms/forms.component.html -->
+<form [formGroup]="movementFormGroup">
+    <mat-dialog-content>
+
+
+  <div class="app-movement-form-container" 
+    gdAreas="store store | value category | bankAccount creditCard | purchaseDate paymentDate | debit debit"
+    gdGap="16px" 
+    gdRows="auto auto auto auto auto"
+    
+    gdAreas.lt-md="store | value | category | bankAccount | creditCard | purchaseDate | paymentDate | debit"
+    gdRows.lt-md="auto auto auto auto auto auto auto auto">
+
+    <mat-form-field gdArea="store">
+      <input matInput placeholder="Store" required formControlName="store" #storeInput>
+      <mat-error *ngFor="let validation of validationMessages.store">
+        <mat-error class="error-message" *ngIf="movementFormGroup.get('store').hasError(validation.type) && 
+                                                (movementFormGroup.get('store').dirty || movementFormGroup.get('store').touched)">
+          {{validation.message}}
+        </mat-error>
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field gdArea="value">
+      <input matInput type="number" currency-mask class="right-align" placeholder="Value" required formControlName="value">
+      <span matPrefix>$&nbsp;</span>
+      <mat-error *ngFor="let validation of validationMessages.value">
+        <mat-error class="error-message" *ngIf="movementFormGroup.get('value').hasError(validation.type) && 
+                                                (movementFormGroup.get('value').dirty || movementFormGroup.get('value').touched)">
+          {{validation.message}}
+        </mat-error>
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field gdArea="category">
+      <input type="text" placeholder="Category" matInput [matAutocomplete]="category" formControlName="category" required>
+      <mat-autocomplete autoActiveFirstOption #category="matAutocomplete" [displayWith]="displayCategory">
+        <mat-option *ngFor="let category of categoryFiltered | async" [value]="category">
+          {{category.title}}
+        </mat-option>
+      </mat-autocomplete>
+      <mat-error *ngFor="let validation of validationMessages.category">
+        <mat-error class="error-message" *ngIf="movementFormGroup.get('category').hasError(validation.type) && 
+                                                (movementFormGroup.get('category').dirty || movementFormGroup.get('category').touched)">
+          {{validation.message}}
+        </mat-error>
+      </mat-error>      
+    </mat-form-field>
+
+    <mat-form-field gdArea="bankAccount">
+      <input type="text" placeholder="Bank Account" matInput [matAutocomplete]="bankAccount" formControlName="bankAccount" required>
+      <mat-autocomplete autoActiveFirstOption #bankAccount="matAutocomplete" [displayWith]="displayBankAccount">
+        <mat-option *ngFor="let bankAccount of bankAccountFiltered | async" [value]="bankAccount">
+          {{bankAccount.bankName}} ({{bankAccount.name}})
+        </mat-option>
+      </mat-autocomplete>
+      <mat-error *ngFor="let validation of validationMessages.bankAccount">
+        <mat-error class="error-message" *ngIf="movementFormGroup.get('bankAccount').hasError(validation.type) && 
+                                                (movementFormGroup.get('bankAccount').dirty || movementFormGroup.get('bankAccount').touched)">
+          {{validation.message}}
+        </mat-error>
+      </mat-error>        
+    </mat-form-field>
+
+    <mat-form-field gdArea="creditCard">
+        <input type="text" placeholder="Credit Card" matInput [matAutocomplete]="creditCard" formControlName="creditCard">
+        <mat-autocomplete autoActiveFirstOption #creditCard="matAutocomplete" [displayWith]="displayCreditCard">
+          <mat-option *ngFor="let creditCard of creditCardFiltered | async" [value]="creditCard">
+            {{creditCard.name}} ({{creditCard.issuer}})
+          </mat-option>
+        </mat-autocomplete>
+      </mat-form-field>    
+
+
+
+    <mat-form-field gdArea="purchaseDate">
+      <input matInput [matDatepicker]="purchaseDate" placeholder="Purchase Date" formControlName="purchaseDate"
+        required>
+      <mat-datepicker-toggle matSuffix [for]="purchaseDate"></mat-datepicker-toggle>
+      <mat-datepicker #purchaseDate></mat-datepicker>
+      <mat-error *ngFor="let validation of validationMessages.purchaseDate">
+        <mat-error class="error-message" *ngIf="movementFormGroup.get('purchaseDate').hasError(validation.type) && 
+                                                (movementFormGroup.get('purchaseDate').dirty || movementFormGroup.get('purchaseDate').touched)">
+          {{validation.message}}
+        </mat-error>
+      </mat-error>       
+    </mat-form-field>
+
+    <mat-form-field gdArea="paymentDate">
+      <input matInput [matDatepicker]="paymentDate" placeholder="Payment Date" formControlName="paymentDate">
+      <mat-datepicker-toggle matSuffix [for]="paymentDate"></mat-datepicker-toggle>
+      <mat-datepicker #paymentDate></mat-datepicker>
+    </mat-form-field>
+
+
+    <div gdArea="debit">
+      <mat-slide-toggle formControlName="debit">Is it a debit?</mat-slide-toggle>
+    </div>
+  </div>
+
+  </mat-dialog-content>
+  <mat-dialog-actions align="end">
+
+      <button mat-button mat-dialog-close>Cancel</button>
+
+      <!-- The mat-dialog-close directive optionally accepts a value as a result for the dialog. -->
+      <button mat-raised-button color="accent" [disabled]="!movementFormGroup.valid" (click)="addMovement()">
+        <mat-icon>save</mat-icon>Add
+      </button>      
+
+      <!-- The mat-dialog-close directive optionally accepts a value as a result for the dialog. -->
+      <button mat-raised-button color="primary" [disabled]="!movementFormGroup.valid" (click)="addMovementAndClose()">
+        <mat-icon>save</mat-icon>Add & Close
+      </button>
+  
+
+    </mat-dialog-actions>  
+</form>

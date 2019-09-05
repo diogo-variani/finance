@@ -1,0 +1,8 @@
+.app-bank-account-edit-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.app-bank-account-edit-container > * {
+  width: 100%;
+}

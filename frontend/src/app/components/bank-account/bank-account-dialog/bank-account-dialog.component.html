@@ -1,0 +1,51 @@
+<!-- https://github.com/AngularTemplates/angular-forms-and-validations/blob/master/src/app/forms/forms.component.html -->
+<form [formGroup]="bankAccountFormGroup">
+  <mat-dialog-content>
+
+    <div class="app-bank-account-edit-container">
+      <h1 mat-dialog-title *ngIf="!data.id">New Bank Account</h1>
+      <h1 mat-dialog-title *ngIf="data.id">Edit Bank Account</h1>
+
+      <mat-form-field>
+        <input matInput placeholder="Name" required formControlName="name">
+        <mat-error *ngFor="let validation of validationMessages.name">
+          <mat-error class="error-message" *ngIf="bankAccountFormGroup.get('name').hasError(validation.type) && 
+                                                  (bankAccountFormGroup.get('name').dirty || bankAccountFormGroup.get('name').touched)">
+            {{validation.message}}
+          </mat-error>
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field>
+        <input matInput placeholder="Bank Name" required formControlName="bankName">
+        <mat-error *ngFor="let validation of validationMessages.bankName">
+          <mat-error class="error-message" *ngIf="bankAccountFormGroup.get('bankName').hasError(validation.type) && 
+                                                  (bankAccountFormGroup.get('bankName').dirty || bankAccountFormGroup.get('bankName').touched)">
+            {{validation.message}}
+          </mat-error>
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field>
+        <input matInput placeholder="IBAN" required formControlName="iban">
+        <mat-error *ngFor="let validation of validationMessages.iban">
+          <mat-error class="error-message" *ngIf="bankAccountFormGroup.get('iban').hasError(validation.type) && 
+                                                  (bankAccountFormGroup.get('iban').dirty || bankAccountFormGroup.get('iban').touched)">
+            {{validation.message}}
+          </mat-error>
+        </mat-error>
+      </mat-form-field>      
+    </div>
+
+  </mat-dialog-content>
+  <mat-dialog-actions align="end">
+
+    <button mat-button mat-dialog-close>Cancel</button>
+
+    <!-- The mat-dialog-close directive optionally accepts a value as a result for the dialog. -->
+    <button mat-raised-button color="primary" (click)="save()" [disabled]="!bankAccountFormGroup.valid">
+      <mat-icon>save</mat-icon>Save
+    </button>
+
+  </mat-dialog-actions>
+</form>

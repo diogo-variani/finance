@@ -1,0 +1,114 @@
+<mat-toolbar>
+  <button mat-button (click)="addMovement()">
+    <mat-icon>add</mat-icon>Add
+  </button>
+  <button mat-button [disabled]="isEditButtonDisabled" (click)="editMovement();">
+    <mat-icon>edit</mat-icon>Edit
+  </button>
+  <button mat-button [disabled]="isDeleteButtonDisabled" (click)="deleteMovement();">
+    <mat-icon>delete</mat-icon>Delete
+  </button>
+  <mat-divider class="style-fix" [vertical]="true"></mat-divider>
+
+  <button mat-button (click)="showFilter();">
+    <mat-icon>filter_list</mat-icon>Filter
+  </button>
+
+</mat-toolbar>
+
+<mat-card>
+  <mat-card-title>Movements</mat-card-title>
+  <mat-card-content>
+
+    <div>
+      <p class="filterDescription" matTooltip="{{getFilterDescription()}}">Filter: {{getFilterDescription()}}</p>
+      <span class="showDetails">
+        <mat-slide-toggle checked="true" [(ngModel)]="showDetails" (click)="setShowDetails">Show Details?
+        </mat-slide-toggle>
+      </span>
+    </div>
+
+    <table mat-table [dataSource]="dataSource" class="mat-elevation-z8" matSort>
+
+      <!-- Checkbox Column -->
+      <ng-container matColumnDef="select">
+        <th mat-header-cell *matHeaderCellDef>
+          <mat-checkbox (change)="$event ? masterToggle() : null" [checked]="selection.hasValue() && isAllSelected()"
+            [indeterminate]="selection.hasValue() && !isAllSelected()">
+          </mat-checkbox>
+        </th>
+        <td mat-cell *matCellDef="let row">
+          <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null"
+            [checked]="selection.isSelected(row)">
+          </mat-checkbox>
+        </td>
+        <td mat-footer-cell *matFooterCellDef> Total </td>
+      </ng-container>
+
+      <!-- Store Column -->
+      <ng-container matColumnDef="store">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Store </th>
+        <td mat-cell *matCellDef="let element"> {{element.store}} </td>
+        <td mat-footer-cell *matFooterCellDef></td>
+      </ng-container>
+
+      <!-- Category Column -->
+      <ng-container matColumnDef="category">
+        <th mat-header-cell *matHeaderCellDef> Category </th>
+        <td mat-cell *matCellDef="let element"> {{getCategoryDescription( element.categoryId )}} </td>
+        <td mat-footer-cell *matFooterCellDef></td>
+      </ng-container>
+
+      <!-- Bank Account Column -->
+      <ng-container matColumnDef="bankAccount">
+        <th mat-header-cell *matHeaderCellDef> Bank Account </th>
+        <td mat-cell *matCellDef="let element"> {{getBankAccountDescription( element.bankAccountId )}} </td>
+        <td mat-footer-cell *matFooterCellDef></td>
+      </ng-container>
+
+      <!-- Purchase Date -->
+      <ng-container matColumnDef="purchaseDate">
+        <th mat-header-cell *matHeaderCellDef> Purchase Date </th>
+        <td mat-cell *matCellDef="let element"> {{element.purchaseDate | date: 'shortDate'}} </td>
+        <td mat-footer-cell *matFooterCellDef></td>
+      </ng-container>
+
+      <!-- Payment Date -->
+      <ng-container matColumnDef="paymentDate">
+        <th mat-header-cell *matHeaderCellDef> Payment Date </th>
+        <td mat-cell *matCellDef="let element"> {{element.paymentDate | date: 'shortDate'}} </td>
+        <td mat-footer-cell *matFooterCellDef></td>
+      </ng-container>
+
+      <!-- Credit Card -->
+      <ng-container matColumnDef="creditCard">
+        <th mat-header-cell *matHeaderCellDef> Credit Card </th>
+        <td mat-cell *matCellDef="let element"> {{getCreditCardDescription( element.creditCardId )}} </td>
+        <td mat-footer-cell *matFooterCellDef></td>
+      </ng-container>
+
+      <!-- Debit -->
+      <ng-container matColumnDef="debit">
+        <th mat-header-cell *matHeaderCellDef> Debit </th>
+        <td mat-cell *matCellDef="let element"> {{element.isDebit ? 'Yes' : 'No'}} </td>
+        <td mat-footer-cell *matFooterCellDef></td>
+      </ng-container>
+
+      <!-- Value Column -->
+      <ng-container matColumnDef="value">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Value </th>
+        <td mat-cell *matCellDef="let element" [ngClass]="(element.isDebit)?'debit':'credit'">
+          {{element.value  | currency}} </td>
+        <td mat-footer-cell *matFooterCellDef [ngClass]="(totalCost >= 0)?'credit':'debit'">{{totalCost | currency}}
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="getDisplayedColumns();"></tr>
+      <tr mat-row *matRowDef="let row; columns: getDisplayedColumns();" (click)="selection.toggle(row)"></tr>
+      <tr mat-footer-row *matFooterRowDef="getDisplayedColumns();"></tr>
+    </table>
+
+    <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+
+  </mat-card-content>
+</mat-card>

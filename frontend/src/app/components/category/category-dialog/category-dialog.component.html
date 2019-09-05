@@ -1,0 +1,45 @@
+<!-- https://github.com/AngularTemplates/angular-forms-and-validations/blob/master/src/app/forms/forms.component.html -->
+<form [formGroup]="categoryFormGroup">
+  <mat-dialog-content>
+
+    <div class="app-category-edit-container">
+      <h1 mat-dialog-title *ngIf="!data.id">New Category</h1>
+      <h1 mat-dialog-title *ngIf="data.id">Edit Category</h1>
+
+      <mat-form-field>
+        <input matInput placeholder="Title" required formControlName="title">
+        <mat-error *ngFor="let validation of validationMessages.title">
+          <mat-error class="error-message" *ngIf="categoryFormGroup.get('title').hasError(validation.type) && 
+                                                  (categoryFormGroup.get('title').dirty || categoryFormGroup.get('title').touched)">
+            {{validation.message}}
+          </mat-error>
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field>
+        <textarea matInput placeholder="Description" formControlName="description"></textarea>
+      </mat-form-field>
+
+      <mat-form-field>
+        <input type="text" placeholder="Parent" aria-label="Number" matInput [matAutocomplete]="parent" formControlName="parent">
+        <mat-autocomplete autoActiveFirstOption #parent="matAutocomplete" [displayWith]="displayTitle">
+          <mat-option *ngFor="let category of filteredOptions | async" [value]="category">
+            {{category.title}}
+          </mat-option>
+        </mat-autocomplete>
+      </mat-form-field>
+
+    </div>
+
+  </mat-dialog-content>
+  <mat-dialog-actions align="end">
+
+    <button mat-button mat-dialog-close>Cancel</button>
+
+    <!-- The mat-dialog-close directive optionally accepts a value as a result for the dialog. -->
+    <button mat-raised-button color="primary" (click)="save()" [disabled]="!categoryFormGroup.valid">
+      <mat-icon>save</mat-icon>Save
+    </button>
+
+  </mat-dialog-actions>
+</form>

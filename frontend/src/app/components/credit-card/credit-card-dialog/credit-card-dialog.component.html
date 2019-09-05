@@ -1,0 +1,52 @@
+<!-- https://github.com/AngularTemplates/angular-forms-and-validations/blob/master/src/app/forms/forms.component.html -->
+<form [formGroup]="creditCardFormGroup">
+  <mat-dialog-content>
+
+    <div class="app-credit-card-edit-container">
+      <h1 mat-dialog-title *ngIf="!data.id">New Credit Card</h1>
+      <h1 mat-dialog-title *ngIf="data.id">Edit Credit Card</h1>
+
+      <mat-form-field>
+        <input matInput placeholder="Name" required formControlName="name">
+        <mat-error *ngFor="let validation of validationMessages.name">
+          <mat-error class="error-message" *ngIf="creditCardFormGroup.get('name').hasError(validation.type) && 
+                                                  (creditCardFormGroup.get('name').dirty || creditCardFormGroup.get('name').touched)">
+            {{validation.message}}
+          </mat-error>
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field>
+        <input matInput placeholder="Issuer" required formControlName="issuer">
+        <mat-error *ngFor="let validation of validationMessages.issuer">
+          <mat-error class="error-message" *ngIf="creditCardFormGroup.get('issuer').hasError(validation.type) && 
+                                                  (creditCardFormGroup.get('issuer').dirty || creditCardFormGroup.get('issuer').touched)">
+            {{validation.message}}
+          </mat-error>
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field>
+        <input matInput placeholder="Card Number" required formControlName="number">
+        <mat-error *ngFor="let validation of validationMessages.number">
+          <mat-error class="error-message" *ngIf="creditCardFormGroup.get('number').hasError(validation.type) && 
+                                                  (creditCardFormGroup.get('number').dirty || creditCardFormGroup.get('number').touched)">
+            {{validation.message}}
+          </mat-error>
+        </mat-error>
+      </mat-form-field>      
+
+    </div>
+
+  </mat-dialog-content>
+  <mat-dialog-actions align="end">
+
+    <button mat-button mat-dialog-close>Cancel</button>
+
+    <!-- The mat-dialog-close directive optionally accepts a value as a result for the dialog. -->
+    <button mat-raised-button color="primary" (click)="save()" [disabled]="!creditCardFormGroup.valid">
+      <mat-icon>save</mat-icon>Save
+    </button>
+
+  </mat-dialog-actions>
+</form>
