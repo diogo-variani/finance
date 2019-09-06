@@ -1,0 +1,18 @@
+//Initialize database
+
+mongod.exe --dbpath d:\test\mongodb\data
+
+//Initial Configuration
+
+mongo.exe
+
+use fiannce
+
+db.createUser(
+  {
+    user: "finance",
+    pwd: "finance",
+    roles: [ { role: "readWrite", db: "finance" } ]
+  }
+)
+
