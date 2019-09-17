@@ -6,7 +6,7 @@ import { MovementDialogComponent } from '../movement-dialog/movement-dialog.comp
 import { MovementService } from 'src/app/services/movement.service';
 import { Movement } from 'src/app/models/movement';
 import { SelectionModel } from '@angular/cdk/collections';
-import { CategoryService } from 'src/app/services/category.service';
+import { CategoryTreeService } from 'src/app/services/category-tree.service';
 import { Category } from 'src/app/models/category';
 import { BankAccount } from 'src/app/models/bank-account';
 import { BankAccountService } from 'src/app/services/bank-account.service';
@@ -15,6 +15,7 @@ import { CreditCardService } from 'src/app/services/credit-card.service';
 import { MovementFilterComponent } from '../movement-filter/movement-filter.component';
 import * as moment from 'moment';
 import { MovementFilter, MONTHS } from 'src/app/models/movement-filter';
+import { untilDestroyed } from 'ngx-take-until-destroy';
 
 @Component({
   selector: 'app-movement-grid',
@@ -60,7 +61,7 @@ export class MovementGridComponent implements OnInit {
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
 
   constructor( public dialog: MatDialog,
-               private _categoryService: CategoryService,
+               private _categoryService: CategoryTreeService,
                private _bankAccountService: BankAccountService,
                private _creditCardService: CreditCardService,
                private _movementService: MovementService,
@@ -68,7 +69,7 @@ export class MovementGridComponent implements OnInit {
   }
 
   ngOnInit() {
-    this._movementService.getEntities().subscribe(data => {
+    this._movementService.getEntities().pipe(untilDestroyed(this)).subscribe(data => {
       this.dataSource.data = [];
       this.dataSource.data = data;
 
@@ -76,28 +77,28 @@ export class MovementGridComponent implements OnInit {
     });
     this.dataSource.sort = this.sort;
 
-    this._categoryService.getEntities().subscribe(categories => {
+    this._categoryService.getEntities().pipe(untilDestroyed(this)).subscribe(categories => {
       this._categories.clear();
       categories.forEach( category => {
         this._categories.set( category.id, category );
       });
     });
 
-    this._bankAccountService.getEntities().subscribe(bankAccounts => {
+    this._bankAccountService.getEntities().pipe(untilDestroyed(this)).subscribe(bankAccounts => {
       this._bankAccounts.clear();
       bankAccounts.forEach( bankAccount => {
         this._bankAccounts.set( bankAccount.id, bankAccount );
       });
     });
 
-    this._creditCardService.getEntities().subscribe(creditCards => {
+    this._creditCardService.getEntities().pipe(untilDestroyed(this)).subscribe(creditCards => {
       this._creditCards.clear();
       creditCards.forEach( creditCard => {
         this._creditCards.set( creditCard.id, creditCard );
       });
     });
 
-    this.selection.changed.subscribe(item => {
+    this.selection.changed.pipe(untilDestroyed(this)).subscribe(item => {
       this.isEditButtonDisabled = this.selection.selected.length != 1;
       this.isDeleteButtonDisabled = this.selection.selected.length == 0;
     }); 
@@ -164,7 +165,7 @@ export class MovementGridComponent implements OnInit {
       
       const movement: Movement = this.selection.selected.shift();
 
-      this._snackBar.open(`Delete movement ${movement.store} (${movement.value})?`, 'Yes', { duration: 5000 }).onAction().subscribe(() => {
+      this._snackBar.open(`Delete movement ${movement.store} (${movement.value})?`, 'Yes', { duration: 5000 }).onAction().pipe(untilDestroyed(this)).subscribe(() => {
         this._movementService.deleteEntity(movement);
         this._snackBar.open(`Movement ${movement.store} (${movement.value}) has been deleted!`);
         this.selection.clear();
@@ -174,7 +175,7 @@ export class MovementGridComponent implements OnInit {
 
       const movements : Movement[] = this.selection.selected;
 
-      this._snackBar.open(`Delete movements?`, 'Yes', { duration: 5000 }).onAction().subscribe(() => {
+      this._snackBar.open(`Delete movements?`, 'Yes', { duration: 5000 }).onAction().pipe(untilDestroyed(this)).subscribe(() => {
         this._movementService.deleteAll(movements);
         this._snackBar.open(`Movements have been deleted!`);
         this.selection.clear();
@@ -194,7 +195,7 @@ export class MovementGridComponent implements OnInit {
       width: '700px'
     });
 
-    dialogRef.afterClosed().subscribe( result => {
+    dialogRef.afterClosed().pipe(untilDestroyed(this)).subscribe( result => {
       this.movementFilter = result;
     });
   }

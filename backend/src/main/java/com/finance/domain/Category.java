@@ -1,11 +1,12 @@
 package com.finance.domain;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 
-import org.bson.codecs.pojo.annotations.BsonIgnore;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "categories")
@@ -18,7 +19,7 @@ public class Category extends BaseEntity {
 
 	private String parentId;
 		
-	@BsonIgnore
+	@Transient
 	@Valid
 	private List<Category> subCategories;
 
@@ -56,6 +57,14 @@ public class Category extends BaseEntity {
 	
 	public boolean hasSubCategories() {
 		return subCategories != null && !subCategories.isEmpty();
+	}
+	
+	public void addSubCategory(Category subCategory) {
+		if( subCategories == null ) {
+			this.subCategories = new ArrayList<Category>();
+		}
+		
+		this.subCategories.add( subCategory );
 	}
 	
 	@Override

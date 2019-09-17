@@ -4,6 +4,7 @@ import { CreditCard } from 'src/app/models/credit-card';
 import { SelectionModel } from '@angular/cdk/collections';
 import { CreditCardService } from 'src/app/services/credit-card.service';
 import { CreditCardDialogComponent } from '../credit-card-dialog/credit-card-dialog.component';
+import { untilDestroyed } from 'ngx-take-until-destroy';
 
 @Component({
   selector: 'app-credit-card-grid',
@@ -33,13 +34,13 @@ export class CreditCardGridComponent  implements OnInit {
 
     this.dataSource.sort = this.sort;
 
-    this.selection.changed.subscribe(item => {
+    this.selection.changed.pipe(untilDestroyed(this)).subscribe(item => {
       this.isEditButtonEnable = this.selection.selected.length == 0;
     })
   }
 
   getCreditCards(){
-    this._creditCardService.getEntities().subscribe(creditCards => {
+    this._creditCardService.getEntities().pipe(untilDestroyed(this)).subscribe(creditCards => {
       this._creditCards = creditCards;
 
       this.dataSource.data = [];
@@ -53,7 +54,7 @@ export class CreditCardGridComponent  implements OnInit {
       data: {}
     });
 
-    dialogRef.afterClosed().subscribe( newCreditCard => {
+    dialogRef.afterClosed().pipe(untilDestroyed(this)).subscribe( newCreditCard => {
       if( newCreditCard ){
         this.getCreditCards();
       }
@@ -66,7 +67,7 @@ export class CreditCardGridComponent  implements OnInit {
       data: this._getSelectedCreditCard()
     });
 
-    dialogRef.afterClosed().subscribe( editedCreditCard => {
+    dialogRef.afterClosed().pipe(untilDestroyed(this)).subscribe( editedCreditCard => {
       if( editedCreditCard ){
         this.getCreditCards();
       }
@@ -76,9 +77,9 @@ export class CreditCardGridComponent  implements OnInit {
   deleteCreditCard() {
     const creditCard : CreditCard = this._getSelectedCreditCard();
 
-    this._snackBar.open(`Delete credit card ${creditCard.name}?`, 'Yes', { duration: 5000 }).onAction().subscribe(() => {
+    this._snackBar.open(`Delete credit card ${creditCard.name}?`, 'Yes', { duration: 5000 }).onAction().pipe(untilDestroyed(this)).subscribe(() => {
       
-      this._creditCardService.deleteEntity(creditCard).subscribe( b => {
+      this._creditCardService.deleteEntity(creditCard).pipe(untilDestroyed(this)).pipe(untilDestroyed(this)).subscribe( b => {
         this.selection.clear();
         this.getCreditCards();
         this._snackBar.open(`Credit card ${creditCard.name} has been deleted!`);

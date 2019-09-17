@@ -23,12 +23,9 @@ import { CreditCardGridComponent } from './components/credit-card/credit-card-gr
 import { MovementGridComponent } from './components/movement/movement-grid/movement-grid.component';
 import { MovementDialogComponent } from './components/movement/movement-dialog/movement-dialog.component';
 import { MovementFilterComponent } from './components/movement/movement-filter/movement-filter.component';
-import { FinanceBackendService } from './fake-backend/finance-backend.service';
-import { HttpClientInMemoryWebApiModule } from 'angular-in-memory-web-api';
-import { environment } from 'src/environments/environment';
+
+
 import { HttpClientModule } from '@angular/common/http';
-
-
 
 @NgModule({
   declarations: [
@@ -54,8 +51,8 @@ import { HttpClientModule } from '@angular/common/http';
     FormsModule,
     FlexLayoutModule,
     MaterialModule,
-    ReactiveFormsModule,
-    environment.production ? [] : HttpClientInMemoryWebApiModule.forRoot(FinanceBackendService)
+    ReactiveFormsModule/*,
+    environment.production ? [] : HttpClientInMemoryWebApiModule.forRoot(FinanceBackendService)*/
     
   ],
   entryComponents: [

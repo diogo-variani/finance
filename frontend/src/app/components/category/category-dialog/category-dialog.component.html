@@ -1,42 +1,103 @@
 <!-- https://github.com/AngularTemplates/angular-forms-and-validations/blob/master/src/app/forms/forms.component.html -->
-<form [formGroup]="categoryFormGroup">
+<form [formGroup]="categoryFormGroup" autocomplete="off">
   <mat-dialog-content>
+    <h1 mat-dialog-title *ngIf="!data.id">New Category</h1>
+    <h1 mat-dialog-title *ngIf="data.id">Edit Category</h1>
 
-    <div class="app-category-edit-container">
-      <h1 mat-dialog-title *ngIf="!data.id">New Category</h1>
-      <h1 mat-dialog-title *ngIf="data.id">Edit Category</h1>
+    <mat-tab-group  dynamicHeight>
+      <mat-tab label="General">
+        <div class="app-category-edit-container">
 
-      <mat-form-field>
-        <input matInput placeholder="Title" required formControlName="title">
-        <mat-error *ngFor="let validation of validationMessages.title">
-          <mat-error class="error-message" *ngIf="categoryFormGroup.get('title').hasError(validation.type) && 
+          <mat-form-field>
+            <input matInput placeholder="Title" required formControlName="title">
+            <mat-error *ngFor="let validation of validationMessages.title">
+              <mat-error class="error-message"
+                *ngIf="categoryFormGroup.get('title').hasError(validation.type) && 
                                                   (categoryFormGroup.get('title').dirty || categoryFormGroup.get('title').touched)">
-            {{validation.message}}
-          </mat-error>
-        </mat-error>
-      </mat-form-field>
+                {{validation.message}}
+              </mat-error>
+            </mat-error>
+          </mat-form-field>
 
-      <mat-form-field>
-        <textarea matInput placeholder="Description" formControlName="description"></textarea>
-      </mat-form-field>
+          <mat-form-field>
+            <input matInput placeholder="Description" formControlName="description">
+          </mat-form-field>
 
-      <mat-form-field>
-        <input type="text" placeholder="Parent" aria-label="Number" matInput [matAutocomplete]="parent" formControlName="parent">
-        <mat-autocomplete autoActiveFirstOption #parent="matAutocomplete" [displayWith]="displayTitle">
-          <mat-option *ngFor="let category of filteredOptions | async" [value]="category">
-            {{category.title}}
-          </mat-option>
-        </mat-autocomplete>
-      </mat-form-field>
+          <mat-form-field>
+            <input type="text" placeholder="Parent" aria-label="Number" matInput [matAutocomplete]="parent"
+              formControlName="parent">
+            <mat-autocomplete autoActiveFirstOption #parent="matAutocomplete" [displayWith]="displayTitle">
+              <mat-option *ngFor="let category of filteredOptions | async" [value]="category">
+                {{category.title}}
+              </mat-option>
+            </mat-autocomplete>
+          </mat-form-field>
 
-    </div>
+        </div>
+      </mat-tab>
+      <mat-tab label="Sub Categories">
 
+        <div>
+          <ng-container formArrayName="subCategories">
+            <!--table mat-table [dataSource]="categoryFormGroup.controls.subCategories.controls" class="mat-elevation-z8"-->
+            <table mat-table #subCategoriesTable [dataSource]="subCategories.controls" class="mat-elevation-z8">
+
+              <!-- Title Column -->
+              <ng-container matColumnDef="title">
+                <th mat-header-cell *matHeaderCellDef>Title </th>
+                <td mat-cell *matCellDef="let element; let index = index" [formGroup]="element">
+                  <mat-form-field>
+                    <input matInput placeholder="Title" formControlName="title" required>
+
+                    <mat-error *ngFor="let validation of validationMessages.title">
+                      <mat-error class="error-message" *ngIf="
+                      subCategories.controls[index].controls.title.invalid && 
+                      ( subCategories.controls[index].controls.title.dirty || 
+                      subCategories.controls[index].controls.title.touched)">
+                        {{validation.message}}
+                      </mat-error>
+                    </mat-error>
+                  </mat-form-field>
+                </td>
+              </ng-container>
+
+              <!-- Description Column -->
+              <ng-container matColumnDef="description">
+                <th mat-header-cell *matHeaderCellDef> Description </th>
+                <td mat-cell *matCellDef="let element" [formGroup]="element">
+                  <mat-form-field>
+                    <input matInput placeholder="Description" formControlName="description">
+                  </mat-form-field>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="action">
+                <th mat-header-cell *matHeaderCellDef></th>
+                <td mat-cell *matCellDef="let element">
+                  <button mat-icon-button (click)="removeSubCategory( index );" >
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="['title', 'description', 'action']"></tr>
+              <tr mat-row *matRowDef="let row; columns: ['title', 'description', 'action'];"></tr>
+            </table>
+            <button mat-mini-fab class="button-badge" (click)="addSubCategory();" >
+              <mat-icon>add</mat-icon>
+            </button>
+          </ng-container>
+          
+        </div>
+      </mat-tab>
+
+    </mat-tab-group>
   </mat-dialog-content>
   <mat-dialog-actions align="end">
 
     <button mat-button mat-dialog-close>Cancel</button>
 
-    <!-- The mat-dialog-close directive optionally accepts a value as a result for the dialog. -->
+
     <button mat-raised-button color="primary" (click)="save()" [disabled]="!categoryFormGroup.valid">
       <mat-icon>save</mat-icon>Save
     </button>

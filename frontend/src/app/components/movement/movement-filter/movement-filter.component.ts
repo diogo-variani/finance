@@ -1,7 +1,7 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
-import { CategoryService } from 'src/app/services/category.service';
+import { CategoryTreeService } from 'src/app/services/category-tree.service';
 import { BankAccountService } from 'src/app/services/bank-account.service';
 import { CreditCardService } from 'src/app/services/credit-card.service';
 import { MovementFormAbstract } from '../../abstract/movement-form-abstract.component';
@@ -23,7 +23,7 @@ export class MovementFilterComponent extends MovementFormAbstract implements OnI
   constructor(public dialogRef: MatDialogRef<MovementFilterComponent>,
     private _formBuilder: FormBuilder,
     @Inject(MAT_DIALOG_DATA) public data: MovementFilter,
-    protected _categoryService: CategoryService,
+    protected _categoryService: CategoryTreeService,
     protected _bankAccountService: BankAccountService,
     protected _creditCardService: CreditCardService) {
 

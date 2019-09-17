@@ -3,6 +3,7 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA, MatSnackBar } from '@angular/material';
 import { BankAccount } from 'src/app/models/bank-account';
 import { BankAccountService } from 'src/app/services/bank-account.service';
+import { untilDestroyed } from 'ngx-take-until-destroy';
 
 @Component({
   selector: 'app-bank-account-dialog',
@@ -57,7 +58,7 @@ export class BankAccountDialogComponent implements OnInit {
       iban: this.bankAccountFormGroup.controls.iban.value
     }
 
-    this._bankAccountService.saveEntity(bankAccount).subscribe( newBankAccount => {
+    this._bankAccountService.saveEntity(bankAccount).pipe(untilDestroyed(this)).subscribe( newBankAccount => {
       this.dialogRef.close(bankAccount);
       this._snackBar.open(`Bank Account ${bankAccount.name} has been ${this.data.id ? 'edited' : 'created'} successfully!`);
     });

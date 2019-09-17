@@ -9,10 +9,12 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,6 +23,7 @@ import com.finance.domain.Category;
 import com.finance.exception.EntityNotFoundException;
 import com.finance.repository.CategoryRepository;
 
+@CrossOrigin()
 @RestController()
 @RequestMapping(path = "/categories")
 public class CategoryController {
@@ -29,35 +32,21 @@ public class CategoryController {
 	private CategoryRepository categoryRepository;
 	
 	@GetMapping(produces = "application/json")
-    public ResponseEntity<Iterable<Category>> getAll() {
-		Iterable<Category> categories = categoryRepository.findAll();
+    public ResponseEntity<List<Category>> getAll() {
+		Iterable<Category> iterable = categoryRepository.findAll();
+		List<Category> categories = new ArrayList<Category>();
+		
+		iterable.forEach( categories::add );
+		
 		return new ResponseEntity<>(categories, HttpStatus.OK );
     }
 	
 	@GetMapping(path = "/{id}", produces = "application/json")
-    public ResponseEntity<?> getById(@PathVariable String id) {
-		
+    public ResponseEntity<?> getById(@PathVariable String id) throws EntityNotFoundException {
 		Optional<Category> optional = categoryRepository.findById(id);
 		
 		if( optional.isPresent() ) {
 			Category category = optional.get();
-			return new ResponseEntity<Category>( category, HttpStatus.OK );
-		}else {
-			throw new EntityNotFoundException(id);
-		}
-    }
-	
-	@GetMapping(path = "/{id}/details", produces = "application/json")
-    public ResponseEntity<?> getDetails(@PathVariable String id) {
-		
-		Optional<Category> optional = categoryRepository.findById(id);
-		
-		if( optional.isPresent() ) {
-			Category category = optional.get();
-			
-			List<Category> subCategories = getSubCategories(category);
-			category.setSubCategories(subCategories);
-			
 			return new ResponseEntity<Category>( category, HttpStatus.OK );
 		}else {
 			throw new EntityNotFoundException(id);
@@ -65,55 +54,52 @@ public class CategoryController {
     }
 	
 	@PostMapping(produces = "application/json", consumes = "application/json")
-	public ResponseEntity<Category> save(@Valid @RequestBody Category category) {
-		Category savedCategory = categoryRepository.save(category);
+	public ResponseEntity<Category> insert(@Valid @RequestBody Category category) {
+		categoryRepository.save(category);
+		category.setSubCategories(null);
+		return new ResponseEntity<Category>( category, HttpStatus.CREATED );
+    }
+	
+	@PutMapping(path = "/{id}", consumes="application/json", produces = "application/json")
+    public ResponseEntity<Category> update(@PathVariable String id, @RequestBody @Valid Category category) throws EntityNotFoundException {
 		
 		/*
-		 * Handling the sub categories
+		 * Looking for the entity based on the id provided by URL.
 		 */
-		if( category.hasSubCategories() ) {
-			List<Category> subCategories = category.getSubCategories();			
-			/*
-			 * Setting the parent id for each sub category...
-			 */
-			String parentId = savedCategory.getId();
-			subCategories.stream().forEach(subCategory -> subCategory.setParentId(parentId));
-			
-			
-			/*
-			 * Saving all sub categories into the database
-			 */
-			Iterable<Category> iterableCategories = categoryRepository.saveAll(subCategories);
-			
-			/*
-			 * Converting the sub categories iterable which was saved into the database
-			 * to a List.
-			 */
-			List<Category> savedSubCategories = new ArrayList<Category>();
-			iterableCategories.forEach( savedSubCategories::add );
-			savedCategory.setSubCategories(savedSubCategories);
-		}
-		
-		return new ResponseEntity<Category>( savedCategory, HttpStatus.CREATED );
-    }
+		Optional<Category> optional = categoryRepository.findById(id);
 
+		if( optional.isPresent() ) {
+			category.setId(id);
+			category = categoryRepository.save(category);
+			return new ResponseEntity<Category>( category, HttpStatus.OK );
+		}else {
+			throw new EntityNotFoundException(id);
+		}
+    }
+	
 	@DeleteMapping(path = "/{id}")
-	public ResponseEntity<?> delete(@PathVariable String id) {
-		
+	public ResponseEntity<?> delete(@PathVariable String id) throws EntityNotFoundException {
 		Optional<Category> optional = categoryRepository.findById(id);
 		
 		if( optional.isPresent() ) {
 			Category category = optional.get();
+			
+			/*
+			 * Since it is a valid category, then firstly we remove the parent references.
+			 */
+			List<Category> subCategories = categoryRepository.findByParentId( category.getId() );
+			if( subCategories != null ) {
+				subCategories.forEach(c -> c.setParentId(null));
+				categoryRepository.saveAll(subCategories);
+			}
+			
+			/*
+			 * Then we delete the category from the database.
+			 */
 			categoryRepository.delete(category);
 			return new ResponseEntity<Category>( HttpStatus.OK );
 		}else {
 			throw new EntityNotFoundException(id);
 		}
     }
-	
-	private List<Category> getSubCategories(Category category){
-		String parentId = category.getId();
-		List<Category> subCategories = categoryRepository.findByParentId(parentId);
-		return subCategories;
-	}
 }

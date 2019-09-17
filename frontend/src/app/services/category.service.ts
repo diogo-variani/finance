@@ -1,3 +1,4 @@
+//https://medium.com/@nsrathore/editable-mat-table-in-angular-7-b46578345b3a
 import { Injectable } from '@angular/core';
 import { Category } from '../models/category';
 import { HttpClient } from '@angular/common/http';
@@ -9,7 +10,7 @@ import { FinanceService } from './finance.service';
 })
 export class CategoryService extends FinanceService<Category>{
   
-  private _endpoint = 'api/categories';
+  private _endpoint = 'http://localhost:8080/categories';
 
   constructor( protected http: HttpClient ) {
     super( http );

@@ -1,8 +1,18 @@
 .app-category-edit-container {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .app-category-edit-container > * {
-    width: 100%;
-  }
+  display: flex;
+  flex-direction: column;
+}
+
+.app-category-edit-container > * {
+  width: 100%;
+}
+
+table mat-form-field {
+  margin: 10px 10px 10px 0;
+}
+
+.button-badge{
+  position: absolute;
+  right: 2px;
+  top: 3px;
+}

@@ -4,6 +4,7 @@ import { BankAccount } from 'src/app/models/bank-account';
 import { MatSort, MatTableDataSource, MatSnackBar, MatDialog } from '@angular/material';
 import { SelectionModel } from '@angular/cdk/collections';
 import { BankAccountDialogComponent } from '../bank-account-dialog/bank-account-dialog.component';
+import { untilDestroyed } from 'ngx-take-until-destroy';
 
 @Component({
   selector: 'app-bank-account-grid',
@@ -33,13 +34,13 @@ export class BankAccountGridComponent implements OnInit {
 
     this.dataSource.sort = this.sort;
 
-    this.selection.changed.subscribe(item => {
+    this.selection.changed.pipe(untilDestroyed(this)).subscribe(item => {
       this.isEditButtonEnable = this.selection.selected.length == 0;     
     });
   }
 
   getBankAccounts(){
-    this._bankAccountService.getEntities().subscribe(data => {
+    this._bankAccountService.getEntities().pipe(untilDestroyed(this)).subscribe(data => {
       this.bankAccounts = data;
       this.dataSource.data = [];
       this.dataSource.data = data;
@@ -52,7 +53,7 @@ export class BankAccountGridComponent implements OnInit {
       data: {}
     });
 
-    dialogRef.afterClosed().subscribe( newBankAccount => {
+    dialogRef.afterClosed().pipe(untilDestroyed(this)).subscribe( newBankAccount => {
       if( newBankAccount ){
         this.getBankAccounts();
       }
@@ -65,7 +66,7 @@ export class BankAccountGridComponent implements OnInit {
       data: this._getSelectedBankAccount()
     });
 
-    dialogRef.afterClosed().subscribe( editedBankAccount => {
+    dialogRef.afterClosed().pipe(untilDestroyed(this)).subscribe( editedBankAccount => {
       if( editedBankAccount ){
         this.getBankAccounts();
       }
@@ -75,9 +76,9 @@ export class BankAccountGridComponent implements OnInit {
   deleteBankAccount() {
     const bankAccount: BankAccount = this._getSelectedBankAccount();
 
-    this._snackBar.open(`Delete bank account ${bankAccount.name}?`, 'Yes', { duration: 5000 }).onAction().subscribe(() => {
+    this._snackBar.open(`Delete bank account ${bankAccount.name}?`, 'Yes', { duration: 5000 }).onAction().pipe(untilDestroyed(this)).subscribe(() => {
       
-      this._bankAccountService.deleteEntity(bankAccount).subscribe( b => {
+      this._bankAccountService.deleteEntity(bankAccount).pipe(untilDestroyed(this)).subscribe( b => {
         this._snackBar.open(`Bank Account ${bankAccount.name} has been deleted!`);
         
         this.selection.clear();

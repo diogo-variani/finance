@@ -13,7 +13,8 @@
 <mat-card>
   <mat-card-title>Bank Accounts</mat-card-title>
   <mat-card-content>
-
+    
+    
     <table mat-table [dataSource]="dataSource" class="mat-elevation-z8" matSort>
 
       <!-- Checkbox Column -->
@@ -48,5 +49,6 @@
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="selection.toggle(row.id)"></tr>
     </table>
+  
   </mat-card-content>
 </mat-card>

@@ -1,6 +1,6 @@
 import { Component, OnInit, Inject, ElementRef, ViewChild } from '@angular/core';
 import { BankAccountService } from 'src/app/services/bank-account.service';
-import { CategoryService } from 'src/app/services/category.service';
+import { CategoryTreeService } from 'src/app/services/category-tree.service';
 import { Category } from 'src/app/models/category';
 import { BankAccount } from 'src/app/models/bank-account';
 import { FormGroup, FormBuilder, Validators, ValidationErrors } from '@angular/forms';
@@ -12,6 +12,7 @@ import { MatDialogRef, MAT_DIALOG_DATA, MatSnackBar } from '@angular/material';
 import { MovementService } from 'src/app/services/movement.service';
 import { Movement } from 'src/app/models/movement';
 import { MovementFormAbstract } from '../../abstract/movement-form-abstract.component';
+import { untilDestroyed } from 'ngx-take-until-destroy';
 
 @Component({
   selector: 'app-movement-dialog',
@@ -48,7 +49,7 @@ export class MovementDialogComponent extends MovementFormAbstract implements OnI
 
   @ViewChild('storeInput', {static: false}) storeInput: ElementRef;
 
-  constructor(protected _categoryService: CategoryService,
+  constructor(protected _categoryService: CategoryTreeService,
     protected _bankAccountService: BankAccountService,
     protected _creditCardService: CreditCardService,
     private _movementService: MovementService,
@@ -76,21 +77,21 @@ export class MovementDialogComponent extends MovementFormAbstract implements OnI
   ngOnInit() {
     super.ngOnInit();
 
-    this._categoryService.getEntities().subscribe(data => {
+    this._categoryService.getEntities().pipe(untilDestroyed(this)).subscribe(data => {
       if( this.categories ){
         const category : Category = this.data ? this._getCategory( this.data.categoryId ) : null;
         this.movementFormGroup.controls.category.setValue( category );
       }
     });
 
-    this._bankAccountService.getEntities().subscribe(data => {
+    this._bankAccountService.getEntities().pipe(untilDestroyed(this)).subscribe(data => {
       if( this.bankAccounts ){
         const bankAccount : BankAccount = this.data ? this._getBankAccount( this.data.bankAccountId ) : null;
         this.movementFormGroup.controls.bankAccount.setValue( bankAccount );
       }
     });
 
-    this._creditCardService.getEntities().subscribe(data => {
+    this._creditCardService.getEntities().pipe(untilDestroyed(this)).subscribe(data => {
       if( this.creditCards ){
         const creditCard : CreditCard = this.data ? this._getCreditCard( this.data.creditCardId ) : null;
         this.movementFormGroup.controls.creditCard.setValue( creditCard );

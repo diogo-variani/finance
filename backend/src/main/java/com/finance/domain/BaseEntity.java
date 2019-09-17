@@ -1,10 +1,13 @@
 package com.finance.domain;
 
+import javax.validation.constraints.Pattern;
+
 import org.springframework.data.annotation.Id;
 
 public abstract class BaseEntity {
 
 	@Id
+	@Pattern(regexp = "\\A(?!\\s*\\Z).+", message = "The id must not be empty")
 	protected String id;
 	
 	public String getId() {

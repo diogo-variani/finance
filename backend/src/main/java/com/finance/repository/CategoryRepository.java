@@ -1,7 +1,6 @@
 package com.finance.repository;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.data.repository.PagingAndSortingRepository;
 
@@ -11,5 +10,6 @@ public interface CategoryRepository extends PagingAndSortingRepository<Category,
 
 	public List<Category> findByParentId(String parentId);
 	
-	public Optional<Category> findByTitle(String title);
+	public long deleteByParentId(String parentId);
+	
 }

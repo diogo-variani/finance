@@ -3,6 +3,7 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA, MatSnackBar } from '@angular/material';
 import { CreditCardService } from 'src/app/services/credit-card.service';
 import { CreditCard } from 'src/app/models/credit-card';
+import { untilDestroyed } from 'ngx-take-until-destroy';
 
 @Component({
   selector: 'app-credit-card-dialog',
@@ -57,7 +58,7 @@ export class CreditCardDialogComponent implements OnInit {
       number: this.creditCardFormGroup.controls.number.value
     }
 
-    this._creditCardService.saveEntity( creditCard ).subscribe( newCreditCard => {
+    this._creditCardService.saveEntity( creditCard ).pipe(untilDestroyed(this)).subscribe( newCreditCard => {
       this._snackBar.open(`Credit Card ${newCreditCard.name} has been ${newCreditCard.id ? 'edited' : 'created'} successfully!`);
       this.dialogRef.close(newCreditCard);
     });

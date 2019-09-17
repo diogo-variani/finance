@@ -1,6 +1,6 @@
 package com.finance.exception;
 
-public class EntityNotFoundException extends RuntimeException{
+public class EntityNotFoundException extends Exception{
 
 	private static final long serialVersionUID = -8909503753296348774L;
 

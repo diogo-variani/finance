@@ -36,9 +36,6 @@ export abstract class FinanceService<E extends FinanceEntity>{
   }
 
   private createEntity(entity: E ) : Observable<E> {
-    let randomId: string = Math.random().toString(36).substring(7);
-    entity.id = randomId;
-
     const endpoint : string = this.getEndpoint();
 
     return this.http.post<E>(endpoint, entity, this.httpOptions);
