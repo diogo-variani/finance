@@ -35,7 +35,7 @@
 
         </div>
       </mat-tab>
-      <mat-tab label="Sub Categories">
+      <mat-tab label="Sub Categories" [disabled]="subCategoriesEnabled">
 
         <div>
           <ng-container formArrayName="subCategories">

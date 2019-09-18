@@ -52,8 +52,7 @@ export class CategoryTreeComponent implements OnInit, OnDestroy {
   dragNodeExpandOverArea: string;
   @ViewChild('emptyItem', { static: false }) emptyItem: ElementRef;
   
-  constructor(private _categoryTreeService: CategoryTreeService,
-    private _categoryService: CategoryService,
+  constructor(private _categoryTreeService: CategoryTreeService,    
     public dialog: MatDialog,
     private _snackBar: MatSnackBar) {    
   }
@@ -63,7 +62,7 @@ export class CategoryTreeComponent implements OnInit, OnDestroy {
     this.treeControl = new FlatTreeControl<CategoryFlatNode>(this.getLevel, this.isExpandable);
     this.dataSource = new MatTreeFlatDataSource(this.treeControl, this.treeFlattener);
 
-    this._loadData();    
+    this._loadTree();    
     this._subscribeSelectionChanges();    
   }
 
@@ -82,7 +81,7 @@ export class CategoryTreeComponent implements OnInit, OnDestroy {
       )
       .subscribe(result => {
         if (result) {
-          this._loadData();
+          this._loadTree();
         }
       }
     );
@@ -98,14 +97,15 @@ export class CategoryTreeComponent implements OnInit, OnDestroy {
       .pipe(
         untilDestroyed(this)
       )
-      .subscribe(result => {
+      .subscribe(result => {        
         if (result) {
-          this._loadData();
+          this._loadTree();
         }
       }
     );
   }
 
+  //https://medium.com/@abshakekumar/snackbar-angular-material-component-with-multiple-actions-88ea3a9d3ddd
   deleteCategory() {
     const category: Category = this._getSelectedCategory();
 
@@ -132,38 +132,56 @@ export class CategoryTreeComponent implements OnInit, OnDestroy {
     );
   }
 
-  private _loadData(){
-    this._loadCategories();
-    this._loadTree();
-  }
-
-  private _loadCategories(){
-    this._categoryService.getEntities()
-      .pipe(
-        untilDestroyed(this)
-      )
-      .subscribe(categories => {
-        this.categories = categories;
-      }
-    );
-  }
-
   private _loadTree() {
+
+    /* 
+     * Storing expanded nodes. These nodes will be expanded again 
+     * after the load.
+     */
+    var expandedNodes : CategoryFlatNode[];
+    if( this.treeControl ){
+      expandedNodes = this.treeControl.expansionModel.selected.filter( c => c.expandable );      
+    }
+
+    /*
+     * Storing selected noded. These nodes will be selected again 
+     * after the load.
+     */
     const selectedCategories: string[] = this.selection.selected;
 
+    /* Loading the tree from the service */
     this._categoryTreeService.getEntities()
       .pipe(
         untilDestroyed(this)
       )
-      .subscribe(categories => {
+      .subscribe(tree => {
         this.dataSource.data = [];
-        this.dataSource.data = categories;
+        this.dataSource.data = tree;        
 
+        /* Converting the tree to a flat list, this will enabled the editing */
+        this._toFlatList(tree, true);
+
+        /* Setting the selected nodes again if they still exist */
         if (selectedCategories) {
           selectedCategories.forEach(categoryId => this.selection.toggle(categoryId));
         }
+
+        /* Setting the expaded nodes again if they still exist */        
+        if( expandedNodes && expandedNodes.length > 0 ){
+          this.treeControl.expansionModel.clear();          
+          //this.treeControl.expansionModel.select(...expandedNodes);          
+        }
       }
     );
+  }
+
+  private _toFlatList( categoryTree : Category[], reset: boolean ){
+    if( reset || !this.categories ){
+      this.categories = [];
+    }
+
+    this.categories = this.categories.concat( categoryTree );
+    categoryTree.filter( c => c.subCategories ).forEach( c => this._toFlatList(c.subCategories, false ));    
   }
 
   private _getSelectedCategory(): Category {
@@ -276,15 +294,18 @@ export class CategoryTreeComponent implements OnInit, OnDestroy {
       } else {
         this.dragFlatNode.parentId = null;
       }
+            
+      this._categoryTreeService.saveEntity(this.dragFlatNode)
+        .pipe( untilDestroyed(this) )
+        .subscribe( newCategory => {
+          
+          this._loadTree();
+          //Expand the root node...
+          /*if (root) {
+            this.treeControl.expand(this.nestedNodeMap.get(root.id));
+          }*/
 
-      //Save the category...
-      this._categoryTreeService.saveEntity(this.dragFlatNode);
-
-      //Expand the root node...
-      if (root) {
-        this.treeControl.expand(this.nestedNodeMap.get(root.id));
-      }
-
+        });
     }
     this.dragFlatNode = null;
     this.dragNodeExpandOverNode = null;

@@ -1,12 +1,12 @@
 import { Component, Inject, OnInit, OnDestroy, ContentChild, ViewChild } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA, MatSnackBar, MatTable } from '@angular/material';
+import { MatDialogRef, MAT_DIALOG_DATA, MatSnackBar, MatTable, MatTab } from '@angular/material';
 import { Category } from 'src/app/models/category';
-import { CategoryTreeService } from 'src/app/services/category-tree.service';
 
 import { Observable } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
 import { FormBuilder, Validators, FormGroup, FormControl, FormArray, AbstractControl, ControlContainer } from '@angular/forms';
 import { untilDestroyed } from 'ngx-take-until-destroy';
+import { CategoryTreeService } from 'src/app/services/category-tree.service';
 
 @Component({
   selector: 'app-category-dialog',
@@ -21,34 +21,66 @@ export class CategoryDialogComponent implements OnInit, OnDestroy {
     ]
   };
 
+  /* Represents the category form group */
   categoryFormGroup: FormGroup;
 
+  /* Array of parents used by the select component */
   parents: Category[];
 
   filteredOptions: Observable<Category[]>;
 
+  /* Reference to sub category data table */
   @ViewChild('subCategoriesTable', {static: false})
   _subCategoriesTable : MatTable<any>;
 
+  /* It enables/disables the sub category tab */
+  subCategoriesEnabled : boolean = false;
+
   constructor(public dialogRef: MatDialogRef<CategoryDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: Category,
-    private _categoryService: CategoryTreeService,
+    private _categoryTreeService: CategoryTreeService,
     private _formBuilder: FormBuilder,
-    private _snackBar: MatSnackBar) {    
+    private _snackBar: MatSnackBar) {
+            
       
-      this.categoryFormGroup = this._formBuilder.group(
-        {
-          title: [this.data ? this.data.title : '', Validators.required],
-          description: [this.data ? this.data.description : ''],
-          parent: '',
-          subCategories: this._formBuilder.array(this.data ? this._toFormGroupArray( this.data.subCategories ) : [] )
-        }
-      );
   }
 
   ngOnInit() {
+
+    /* Creating the form group and populate it with the specified input data */
+    this.categoryFormGroup = this._formBuilder.group(
+      {
+        title: [this.data ? this.data.title : '', Validators.required],
+        description: [this.data ? this.data.description : ''],
+        parent: '',
+        subCategories: this._formBuilder.array(this.data ? this._toFormGroupArray( this.data.subCategories ) : [] )
+      }
+    );
+
+    /* Load parents */
     this._subscribeParent();
+
+
     this._subscribeSubCategories();
+
+    /* 
+     * If the input category has a parent, then the 
+     * subcategories tab must be disabled
+     */
+    if( this.data && this.data.parentId ){
+      this.subCategoriesEnabled = true;
+    }
+
+    /* 
+     * Listen the parent changes, it will enable or disable the subcategories
+     * based on the parent value.
+     * If there is a selected value, the sub categories tab will be disabled,
+     * otherwise it will be enabled.
+     */
+
+    this.categoryFormGroup.controls.parent.valueChanges
+      .pipe( untilDestroyed( this ) )
+      .subscribe( value => this.subCategoriesEnabled = !!value );        
   }
 
   ngOnDestroy(): void {    
@@ -56,24 +88,23 @@ export class CategoryDialogComponent implements OnInit, OnDestroy {
 
   private _subscribeParent(){
 
-    this._categoryService.getEntities().pipe(
+    this._categoryTreeService.getRoots().pipe(
       untilDestroyed(this)
     ).subscribe(data => {
       this.parents = data;
 
       if( this.parents ){
-
         
         // Load the category parent based on the category list.
         const parent : Category = this.data ? this._getParent( this.data.parentId ) : null;
         this.categoryFormGroup.controls.parent.setValue( parent );
 
-        //  Configure the parent auto complete
+        //  Configure the parent auto complete filter
         this.filteredOptions = this.categoryFormGroup.controls.parent.valueChanges
         .pipe(
           startWith(''),
           map(value => typeof value === 'string' ? value : value.title),
-          map(title => title ? this._filter(title) : this.parents.slice())
+          map(title => title ? this._filter(title) : this.parents.slice())        
         );   
       }
     });
@@ -108,10 +139,10 @@ export class CategoryDialogComponent implements OnInit, OnDestroy {
       title: this._title.value,
       description: this._description.value,
       parentId: this._parent.value ? this._parent.value.id : null,
-      subCategories : this._toSubCategories()
+      subCategories : this._parent.value ? [] : this._toSubCategories()
     }
 
-    this._categoryService.saveEntity(category)
+    this._categoryTreeService.saveEntity(category)
     .pipe(untilDestroyed(this))
     .subscribe(newCategory => {
       this.dialogRef.close(category);
@@ -150,9 +181,7 @@ export class CategoryDialogComponent implements OnInit, OnDestroy {
     return this.categoryFormGroup.get('subCategories') as FormArray;    
   }
 
-  private _toSubCategories() : Category[] {
-    console.log( this.subCategories.controls )
-    console.log( this.subCategories.controls.values.length )
+  private _toSubCategories() : Category[] {    
     return this.subCategories.controls.map( this._toSubCategory );
   }
 
