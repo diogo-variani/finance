@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { BankAccountService } from 'src/app/services/bank-account.service';
 import { BankAccount } from 'src/app/models/bank-account';
 import { MatSort, MatTableDataSource, MatSnackBar, MatDialog } from '@angular/material';
@@ -11,8 +11,8 @@ import { untilDestroyed } from 'ngx-take-until-destroy';
   templateUrl: './bank-account-grid.component.html',
   styleUrls: ['./bank-account-grid.component.scss']
 })
-export class BankAccountGridComponent implements OnInit {
-
+export class BankAccountGridComponent implements OnInit, OnDestroy {
+  
   displayedColumns: string[] = ['select', 'name', 'bankName', 'iban'];
 
   dataSource: MatTableDataSource<BankAccount> = new MatTableDataSource();
@@ -39,6 +39,9 @@ export class BankAccountGridComponent implements OnInit {
     });
   }
 
+  ngOnDestroy(): void {   
+  }  
+
   getBankAccounts(){
     this._bankAccountService.getEntities().pipe(untilDestroyed(this)).subscribe(data => {
       this.bankAccounts = data;
@@ -48,22 +51,17 @@ export class BankAccountGridComponent implements OnInit {
   }
 
   newBankAccount() {
-    const dialogRef = this.dialog.open(BankAccountDialogComponent, {
-      width: '500px',
-      data: {}
-    });
-
-    dialogRef.afterClosed().pipe(untilDestroyed(this)).subscribe( newBankAccount => {
-      if( newBankAccount ){
-        this.getBankAccounts();
-      }
-    });    
+    this._openDialog();
   }
 
   editBankAccount() {
+    this._openDialog( this._getSelectedBankAccount() );
+  }
+
+  private _openDialog( bankAccount? : BankAccount ){
     const dialogRef = this.dialog.open(BankAccountDialogComponent, {
       width: '500px',
-      data: this._getSelectedBankAccount()
+      data: bankAccount
     });
 
     dialogRef.afterClosed().pipe(untilDestroyed(this)).subscribe( editedBankAccount => {

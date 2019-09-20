@@ -1,98 +1,98 @@
 //https://github.com/alerubis/angular-draggable-mat-tree
-import { Component, ElementRef, ViewChild, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 
-import { FlatTreeControl } from '@angular/cdk/tree';
 import { MatDialog } from '@angular/material/dialog';
-import { MatTreeFlatDataSource, MatTreeFlattener } from '@angular/material/tree';
 
 import { Category } from 'src/app/models/category';
 import { CategoryDialogComponent } from '../category-dialog/category-dialog.component';
-import { SelectionModel } from '@angular/cdk/collections';
 import { MatSnackBar } from '@angular/material';
 import { untilDestroyed } from 'ngx-take-until-destroy';
 import { CategoryTreeService } from 'src/app/services/category-tree.service';
-import { CategoryService } from 'src/app/services/category.service';
+import { FlatTreeNode } from '../../abstract/tree/draggable-tree/draggable-tree.component';
+import { SelectableTreeComponent } from '../../abstract/tree/selectable-tree/selectable-tree.component';
 
-/** Flat to-do item node with expandable and level information */
-export class CategoryFlatNode extends Category {
-  level: number;
-  expandable: boolean;
+/*
+ * Category flat tree node to be used in the tree.
+ */
+export class CategoryFlatNode extends Category implements FlatTreeNode{
+  level : number;
+
+  getNodeName(): String {
+    return this.title;
+  }
+
+  isExpandable(): boolean {
+    return this.subCategories && this.subCategories.length > 0;
+  } 
 }
 
+/*
+ * Represents the category tree component.
+ */
 @Component({
   selector: 'app-category-tree',
   templateUrl: './category-tree.component.html',
   styleUrls: ['./category-tree.component.scss']
 })
-export class CategoryTreeComponent implements OnInit, OnDestroy {
+export class CategoryTreeComponent extends SelectableTreeComponent<Category, CategoryFlatNode> implements OnInit, OnDestroy {
+     
+  /*
+   * Represents the default dialog width.
+   */
+  private readonly DEFAULT_CATEGORY_DIALOG_WIDTH: string = '500px';
 
-  private DEFAULT_CATEGORY_DIALOG_WIDTH: string = '500px';
-
-  /** Map from nested node to flattened node. This helps us to keep the same object for selection */
-  nestedNodeMap = new Map<string, CategoryFlatNode>();
-
-  treeControl: FlatTreeControl<CategoryFlatNode>;
-
-  treeFlattener: MatTreeFlattener<Category, CategoryFlatNode>;
-
-  dataSource: MatTreeFlatDataSource<Category, CategoryFlatNode>;
-
-  /** The selection for checklist */
-  selection = new SelectionModel<string>(false /* multiple */);
-
+  /*
+   * Represents the if the edit button is enabled or not. 
+   */
   isEditButtonEnable: boolean = true;
 
+  /*
+   * Represents a category flat list created from the tree.
+   */
   categories: Category[];
-
-  /* Drag and drop */
-  dragFlatNode: CategoryFlatNode;
-  dragNodeExpandOverWaitTimeMs = 300;
-  dragNodeExpandOverNode: CategoryFlatNode;
-  dragNodeExpandOverTime: number;
-  dragNodeExpandOverArea: string;
-  @ViewChild('emptyItem', { static: false }) emptyItem: ElementRef;
-  
+    
   constructor(private _categoryTreeService: CategoryTreeService,    
     public dialog: MatDialog,
     private _snackBar: MatSnackBar) {    
+      super();
   }
 
   ngOnInit(): void {
-    this.treeFlattener = new MatTreeFlattener(this.transformer, this.getLevel, this.isExpandable, this.getChildren);
-    this.treeControl = new FlatTreeControl<CategoryFlatNode>(this.getLevel, this.isExpandable);
-    this.dataSource = new MatTreeFlatDataSource(this.treeControl, this.treeFlattener);
-
+    super.ngOnInit();
+    
     this._loadTree();    
     this._subscribeSelectionChanges();    
   }
 
-  ngOnDestroy(): void {    
+  ngOnDestroy(): void {        
   }  
 
+  /*
+   * It opens a dialog in order to create a new category.
+   */
   newCategory() {
-    const dialogRef = this.dialog.open(CategoryDialogComponent, {
-      width: this.DEFAULT_CATEGORY_DIALOG_WIDTH,
-      data: {}
-    });
-
-    dialogRef.afterClosed()
-      .pipe(
-        untilDestroyed(this)
-      )
-      .subscribe(result => {
-        if (result) {
-          this._loadTree();
-        }
-      }
-    );
+    this._openDialog();
   }
 
+  /*
+   * It opens a dialog in order to edit a selected category.
+   */
   editCategory() {
+    const selectedCategory : Category = this._getSelectedCategory();
+    this._openDialog( selectedCategory );
+  }
+
+  /*
+   * It opens the edition/creation dialog and reload the tree if there is any result.
+   *
+   * @param - the data that eventually will be edited. Null if it is a new category.
+   */
+  private _openDialog( data? : Category ) {
     const dialogRef = this.dialog.open(CategoryDialogComponent, {
       width: this.DEFAULT_CATEGORY_DIALOG_WIDTH,
-      data: this._getSelectedCategory()
+      data: data
     });
-
+    
     dialogRef.afterClosed()
       .pipe(
         untilDestroyed(this)
@@ -105,6 +105,9 @@ export class CategoryTreeComponent implements OnInit, OnDestroy {
     );
   }
 
+  /*
+   * It deletes the selected category.
+   */
   //https://medium.com/@abshakekumar/snackbar-angular-material-component-with-multiple-actions-88ea3a9d3ddd
   deleteCategory() {
     const category: Category = this._getSelectedCategory();
@@ -121,6 +124,10 @@ export class CategoryTreeComponent implements OnInit, OnDestroy {
     );
   }
 
+  /*
+   * Subscribe to tree selecion event. It happens to enable or disable the 
+   * toolbar buutons.
+   */
   private _subscribeSelectionChanges(){
     this.selection.changed
       .pipe(
@@ -132,22 +139,10 @@ export class CategoryTreeComponent implements OnInit, OnDestroy {
     );
   }
 
+  /*
+   * It loads the category tree from an external service.
+   */
   private _loadTree() {
-
-    /* 
-     * Storing expanded nodes. These nodes will be expanded again 
-     * after the load.
-     */
-    var expandedNodes : CategoryFlatNode[];
-    if( this.treeControl ){
-      expandedNodes = this.treeControl.expansionModel.selected.filter( c => c.expandable );      
-    }
-
-    /*
-     * Storing selected noded. These nodes will be selected again 
-     * after the load.
-     */
-    const selectedCategories: string[] = this.selection.selected;
 
     /* Loading the tree from the service */
     this._categoryTreeService.getEntities()
@@ -159,23 +154,22 @@ export class CategoryTreeComponent implements OnInit, OnDestroy {
         this.dataSource.data = tree;        
 
         /* Converting the tree to a flat list, this will enabled the editing */
-        this._toFlatList(tree, true);
-
-        /* Setting the selected nodes again if they still exist */
-        if (selectedCategories) {
-          selectedCategories.forEach(categoryId => this.selection.toggle(categoryId));
-        }
-
-        /* Setting the expaded nodes again if they still exist */        
-        if( expandedNodes && expandedNodes.length > 0 ){
-          this.treeControl.expansionModel.clear();          
-          //this.treeControl.expansionModel.select(...expandedNodes);          
-        }
+        this._toFlatList(tree);
+        this.treeControl.expansionModel.clear();        
       }
     );
   }
 
-  private _toFlatList( categoryTree : Category[], reset: boolean ){
+  /*
+   * Converts a category tree to a flat list.
+   *
+   * @param categoryTree - the category tree that will be converted.
+   * @param reset - if the category array must be reset. Otherwise the values will be 
+   *                concated in the end of the list. The default value is true.
+   */
+  private _toFlatList( categoryTree : Category[], reset: boolean = true ){
+    
+    /* If reset is true, the the array is cleaned */
     if( reset || !this.categories ){
       this.categories = [];
     }
@@ -184,6 +178,11 @@ export class CategoryTreeComponent implements OnInit, OnDestroy {
     categoryTree.filter( c => c.subCategories ).forEach( c => this._toFlatList(c.subCategories, false ));    
   }
 
+  /*
+   * Retrieves the selected category.
+   *
+   * @returns the category selected in the screen.
+   */
   private _getSelectedCategory(): Category {
     if (this.selection.isEmpty()) {
       return null;
@@ -198,10 +197,18 @@ export class CategoryTreeComponent implements OnInit, OnDestroy {
     return this._getCategoryById(id);
   }
 
+  /*
+   * Query the category array and returns the category identified by the id.
+   *
+   * @param id - The category id.
+   * 
+   * @returns the category if found otherwise it returns null.
+   */
   private _getCategoryById(id: string): Category {
     if (!id) {
       return null;
     }
+
 
     const categories: Category[] = this.categories.filter(c => c.id === id);
 
@@ -212,125 +219,63 @@ export class CategoryTreeComponent implements OnInit, OnDestroy {
     return categories.shift();
   }
 
+  /*
+   * This methos is called when a node is moved and dragged into the tree.
+   * If this node was dragged over other one, then the target is represented by the parameter newRoot.
+   * 
+   * @param newRoot - The new root node where the node was dragged into. 
+   *                  If the node was not dragged over other node, then this parameter is null.
+   * @param node - The node that was moved.   * 
+   */
+  protected nodeMoved(root: CategoryFlatNode, node: CategoryFlatNode) {    
+    if( root ){
+      node.parentId = root.id;
+    }else{
+      node.parentId = null;
+    }
+
+
+    this._categoryTreeService.saveEntity(node)
+      .pipe( untilDestroyed(this) )
+      .subscribe( newCategory => {
+          this._loadTree();
+      });    
+  }
+ 
+  /*
+   * Returnes the children of an specific application node.
+   *
+   * @param node - The application node.
+   * 
+   * @returns The children of the node specified.
+   */  
+  getNodeChildren(node: Category): Category[] {
+    return node.subCategories;
+  }
 
   /*
-   *  Drag & drop functions.
+   * Creates a flat tree node based on the application entity and an specific level.
+   *
+   * @param node - The application entity.
+   * @param number - the node level.
+   * 
+   * @returns The new flat tree node created.
    */
-
-  getLevel = (node: CategoryFlatNode) => node.level;
-
-  isExpandable = (node: CategoryFlatNode) => node.expandable;
-
-  getChildren = (node: Category): Category[] => node.subCategories;
-
-  hasChild = (_: number, _nodeData: CategoryFlatNode) => _nodeData.expandable;
-
-  hasNoContent = (_: number, _nodeData: CategoryFlatNode) => _nodeData.title === '';
-
-  /**
-   * Transformer to convert nested node to flat node. Record the nodes in maps for later use.
-   */
-  transformer = (node: Category, level: number) => {
-    const flatNode = new CategoryFlatNode();
+  createFlatTreeNode(node: Category, level: number): CategoryFlatNode {
+    const flatNode = new CategoryFlatNode();    
     Object.assign(flatNode, node);
+
     flatNode.level = level;
-    flatNode.expandable = (node.subCategories && node.subCategories.length > 0);
-    this.nestedNodeMap.set(node.id, flatNode);
     return flatNode;
   }
 
-  /** Whether part of the descendants are selected */
-  descendantsPartiallySelected(node: CategoryFlatNode): boolean {
-    const descendants = this.treeControl.getDescendants(node);
-    const result = descendants.some(child => this.selection.isSelected(child.id));
-    return result;
+  /*
+   * It retrieves the node id, which is used as key by the selection model.
+   *
+   * @param node - The node related to the id retrieved.
+   * @returns the id related to the node.
+   */  
+  protected getNodeId(node: CategoryFlatNode): string {
+    return node.id;
   }
-
-  handleDragStart(event, node) {
-    // Required by Firefox (https://stackoverflow.com/questions/19055264/why-doesnt-html5-drag-and-drop-work-in-firefox)
-    event.dataTransfer.setData('foo', 'bar');
-    event.dataTransfer.setDragImage(this.emptyItem.nativeElement, 0, 0);
-    this.dragFlatNode = node;
-    this.treeControl.collapse(node);
-  }
-
-  handleDragOver(event, node) {
-    event.preventDefault();
-
-    // Handle node expand
-    if (node === this.dragNodeExpandOverNode) {
-      if (this.dragFlatNode !== node && !this.treeControl.isExpanded(node)) {
-        if ((new Date().getTime() - this.dragNodeExpandOverTime) > this.dragNodeExpandOverWaitTimeMs) {
-          this.treeControl.expand(node);
-        }
-      }
-    } else {
-      this.dragNodeExpandOverNode = node;
-      this.dragNodeExpandOverTime = new Date().getTime();
-    }
-
-    // Handle drag area
-    const percentageX = event.offsetX / event.target.clientWidth;
-    const percentageY = event.offsetY / event.target.clientHeight;
-    if (percentageY < 0.25) {
-      this.dragNodeExpandOverArea = 'above';
-    } else if (percentageY > 0.75) {
-      this.dragNodeExpandOverArea = 'below';
-    } else {
-      this.dragNodeExpandOverArea = 'center';
-    }
-  }
-
-  handleDrop(event, flatNode: CategoryFlatNode) {
-    event.preventDefault();
-    if (flatNode !== this.dragFlatNode) {
-
-      //Get the dragged node's root...
-      let root: CategoryFlatNode = this.getRoot(this.dragNodeExpandOverNode);
-
-      //Configure the parent id if there is a root...
-      if (!this.isRoot(this.dragNodeExpandOverNode) || this.dragNodeExpandOverArea == 'center') {
-        this.dragFlatNode.parentId = root.id;
-      } else {
-        this.dragFlatNode.parentId = null;
-      }
-            
-      this._categoryTreeService.saveEntity(this.dragFlatNode)
-        .pipe( untilDestroyed(this) )
-        .subscribe( newCategory => {
-          
-          this._loadTree();
-          //Expand the root node...
-          /*if (root) {
-            this.treeControl.expand(this.nestedNodeMap.get(root.id));
-          }*/
-
-        });
-    }
-    this.dragFlatNode = null;
-    this.dragNodeExpandOverNode = null;
-    this.dragNodeExpandOverTime = 0;
-  }
-
-  isRoot(node: CategoryFlatNode): boolean {
-    return node.parentId == null;
-  }
-
-  private getRoot(child: CategoryFlatNode): CategoryFlatNode {
-    if (!child) return null;
-
-    let parent: CategoryFlatNode = this.nestedNodeMap.get(child.id);
-
-    while (parent.parentId) {
-      parent = this.nestedNodeMap.get(parent.parentId);
-    }
-
-    return parent;
-  }
-
-  handleDragEnd(event) {
-    this.dragFlatNode = null;
-    this.dragNodeExpandOverNode = null;
-    this.dragNodeExpandOverTime = 0;
-  }   
 }

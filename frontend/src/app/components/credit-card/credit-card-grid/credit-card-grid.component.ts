@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { MatTableDataSource, MatDialog, MatSnackBar, MatSort } from '@angular/material';
 import { CreditCard } from 'src/app/models/credit-card';
 import { SelectionModel } from '@angular/cdk/collections';
@@ -11,8 +11,8 @@ import { untilDestroyed } from 'ngx-take-until-destroy';
   templateUrl: './credit-card-grid.component.html',
   styleUrls: ['./credit-card-grid.component.scss']
 })
-export class CreditCardGridComponent  implements OnInit {
-
+export class CreditCardGridComponent  implements OnInit, OnDestroy {
+  
   displayedColumns: string[] = ['select', 'name', 'issuer', 'number'];
 
   dataSource: MatTableDataSource<CreditCard> = new MatTableDataSource();
@@ -38,6 +38,9 @@ export class CreditCardGridComponent  implements OnInit {
       this.isEditButtonEnable = this.selection.selected.length == 0;
     })
   }
+
+  ngOnDestroy(): void {   
+  }  
 
   getCreditCards(){
     this._creditCardService.getEntities().pipe(untilDestroyed(this)).subscribe(creditCards => {
