@@ -117,9 +117,13 @@ export class CategoryTreeComponent extends SelectableTreeComponent<Category, Cat
         untilDestroyed(this)
       )
       .subscribe(() => {
-        this._categoryTreeService.deleteEntity(category);
-        this._snackBar.open(`Category ${category.title} has been deleted!`);
-        this.selection.clear();
+        this._categoryTreeService.deleteEntity(category).pipe(
+          untilDestroyed(this)
+        )
+        .subscribe(tree => {
+          this._snackBar.open(`Category ${category.title} has been deleted!`);
+          this._loadTree();
+        });
       }
     );
   }

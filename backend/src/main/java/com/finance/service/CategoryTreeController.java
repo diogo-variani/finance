@@ -57,7 +57,7 @@ public class CategoryTreeController {
 	
 	@GetMapping(path = "/{id}", produces = "application/json")
     public ResponseEntity<Category> getById(@PathVariable String id) throws EntityNotFoundException {
-		logger.info("Loading tree by id %s...", id);
+		logger.info("Loading tree by id {}...", id);
 		
 		Optional<Category> optional = categoryRepository.findById(id);
 		
@@ -81,7 +81,7 @@ public class CategoryTreeController {
 	
 	@PostMapping(consumes = "application/json", produces = "application/json")
 	public ResponseEntity<Category> insert( @RequestBody @Valid Category category ){
-		logger.info("Inserting new category tree %s", category.toString());
+		logger.info("Inserting new category tree {}", category.toString());
 		
 		deepInsert( category );
 		return new ResponseEntity<Category>( category, HttpStatus.OK );
@@ -89,7 +89,7 @@ public class CategoryTreeController {
 	
 	@PutMapping(path = "/{id}", consumes = "application/json", produces = "application/json")
 	public ResponseEntity<Category> update( @PathVariable String id, @RequestBody @Valid Category category ){
-		logger.info("Updating category tree %s: %s", id, category.toString());
+		logger.info("Updating category tree {}: {}", id, category.toString());
 		
 		category.setId(id);
 		deepUpdate( category );
@@ -98,7 +98,7 @@ public class CategoryTreeController {
 	
 	@DeleteMapping(path = "/{id}", produces = "application/json")
 	public ResponseEntity<?> delete( @PathVariable String id ) throws EntityNotFoundException{
-		logger.info("Deleting category tree %s", id);
+		logger.info("Deleting category tree {}", id);
 		
 		Optional<Category> optional = categoryRepository.findById(id);
 		
@@ -160,7 +160,7 @@ public class CategoryTreeController {
 		String title = category.getTitle();
 		String id = category.getId();
 		
-		logger.debug("Deep loading of category %s (%s)", title, id);
+		logger.debug("Deep loading of category {} ({})", title, id);
 		
 		List<Category> subCategories = categoryRepository.findByParentId(id);
 		
