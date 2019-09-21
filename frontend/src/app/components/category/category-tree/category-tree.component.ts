@@ -24,7 +24,7 @@ export class CategoryFlatNode extends Category implements FlatTreeNode{
 
   isExpandable(): boolean {
     return this.subCategories && this.subCategories.length > 0;
-  } 
+  }
 }
 
 /*
@@ -179,9 +179,9 @@ export class CategoryTreeComponent extends SelectableTreeComponent<Category, Cat
    */
   private _loadTree() {
 
-    const nodes : CategoryFlatNode[] = this.treeControl.expansionModel.selected.filter( c => c.isExpandable() );
-    console.log( nodes );
-    
+    /* Storing the expanded nodes before the tree refresh */
+    const expandedNodes : CategoryFlatNode[] = this.treeControl.expansionModel.selected.filter( c => c.isExpandable() );
+
     /* Loading the tree from the service */
     this._categoryTreeService.getEntities()
       .pipe(
@@ -193,17 +193,22 @@ export class CategoryTreeComponent extends SelectableTreeComponent<Category, Cat
 
         /* Converting the tree to a flat list, this will enabled the editing */
         this._toFlatList(tree);
+
+        /* 
+         * The expansionModel keeps the expanded nodes even after the tree refresh.
+         * It is here to avoid memory leak.
+         */
         this.treeControl.expansionModel.clear();
 
-        if( nodes && nodes.length > 0 ){
+        /* Restoring the expanded tree status */
+        if( expandedNodes && expandedNodes.length > 0 ){
           /* 
-           * If we tray to expand a node from the previous tree, it doesn't work, even if the object are equals.
+           * If we try to expand a node from the previous tree, it doesn't work, even if the object are equals.
            * In order to expand the nodes expanded before, we need to search them into the treeControl and then 
            * expand that.
            */
 
-          //this.treeControl.dataNodes.filter(  )
-
+          this.treeControl.dataNodes.filter( c => expandedNodes.some( n => n.id === c.id ) ).forEach( c => this.treeControl.expand( c ) );
         }
       }
     );

@@ -12,7 +12,8 @@ export interface FlatTreeNode {
   getNodeName() : String;
 
   /* Indicates if the node is expandable */
-  isExpandable() : boolean; 
+  isExpandable() : boolean;
+
 }
 
 /*
