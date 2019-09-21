@@ -154,8 +154,8 @@ export abstract class DraggableTreeComponent<O, T extends FlatTreeNode> implemen
     
     if (flatNode !== this.dragFlatNode) {
       
-        /* Call save node */
-        this.nodeMoved( this.dragNodeExpandOverNode, this.dragFlatNode );
+      /* Call save node */
+      this.nodeMoved( this.dragNodeExpandOverNode, this.dragFlatNode );
       
     }
 

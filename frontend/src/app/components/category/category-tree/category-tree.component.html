@@ -1,16 +1,22 @@
 <mat-toolbar>
-  <button mat-button (click)="newCategory()">
-    <mat-icon>add</mat-icon>New
-  </button>
-  <button mat-button [disabled]="isEditButtonEnable" (click)="editCategory()">
-    <mat-icon>edit</mat-icon>Edit
-  </button>
-  <button mat-button [disabled]="isEditButtonEnable" (click)="deleteCategory()">
-    <mat-icon>delete</mat-icon>Delete
-  </button>
+  <div fxLayoutAlign="start stretch" fxLayoutGap="8px">
+    <button mat-icon-button (click)="newCategory()" matTooltip="Create a new category">
+      <mat-icon>add</mat-icon>
+    </button>
+    <button mat-icon-button [disabled]="isCategorySelected" (click)="editCategory()" matTooltip="Edit the selected category">
+      <mat-icon>edit</mat-icon>
+    </button>
+    <mat-divider [vertical]="true"></mat-divider>
+    <button mat-icon-button [disabled]="isCategorySelected" (click)="deleteCategoryTree()" matTooltip="Delete the whole tree selected">
+      <mat-icon svgIcon="delete-tree"></mat-icon>
+    </button>
+    <button mat-icon-button [disabled]="isCategorySelected" (click)="deleteCategoryNode()" matTooltip="Delete the single node selected">
+      <mat-icon svgIcon="delete-node"></mat-icon>
+    </button>
+  </div>
 </mat-toolbar>
 <mat-card>
-  <mat-card-title>Categories</mat-card-title>
+  <mat-card-title>Categories</mat-card-title> 
   <mat-card-content>
     <div>
       <mat-tree [dataSource]="dataSource" [treeControl]="treeControl" class="app-category-list">
@@ -23,13 +29,13 @@
                                 'drop-center': dragNodeExpandOverArea === 'center' && dragNodeExpandOverNode === node}"
             [checked]="selection.isSelected(node.id)" (change)="selection.toggle(node.id);" draggable="true"
             (dragstart)="handleDragStart($event, node);" (dragover)="handleDragOver($event, node);"
-            (drop)="handleDrop($event, node);" (dragend)="handleDragEnd($event);">{{node.title}}</mat-checkbox>
+            (drop)="handleDrop($event, node);" (dragend)="handleDragEnd($event);" [matTooltip]="node.description">{{node.title}}</mat-checkbox>
 
 
         </mat-tree-node>
 
         <!-- This is the tree node template for expandable nodes -->
-        <mat-tree-node *matTreeNodeDef="let node; when: hasChild" matTreeNodePadding>
+        <mat-tree-node *matTreeNodeDef="let node; when: hasChild" matTreeNodePadding >
 
           <button mat-icon-button matTreeNodeToggle [attr.aria-label]="'toggle ' + node.filename">
             <mat-icon class="mat-icon-rtl-mirror">
@@ -42,7 +48,8 @@
                               'drop-center': dragNodeExpandOverArea === 'center' && dragNodeExpandOverNode === node}"
             draggable="true" (dragstart)="handleDragStart($event, node);" (dragover)="handleDragOver($event, node);"
             (drop)="handleDrop($event, node);" (dragend)="handleDragEnd($event);"
-            [checked]="selection.isSelected(node.id)" (change)="selection.toggle(node.id);" [indeterminate]="descendantsPartiallySelected(node)">{{node.title}}
+            [checked]="selection.isSelected(node.id)" (change)="selection.toggle(node.id);"
+            [indeterminate]="descendantsPartiallySelected(node)" [matTooltip]="node.description">{{node.title}}
           </mat-checkbox>
 
         </mat-tree-node>

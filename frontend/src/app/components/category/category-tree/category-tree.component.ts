@@ -10,6 +10,7 @@ import { untilDestroyed } from 'ngx-take-until-destroy';
 import { CategoryTreeService } from 'src/app/services/category-tree.service';
 import { FlatTreeNode } from '../../abstract/tree/draggable-tree/draggable-tree.component';
 import { SelectableTreeComponent } from '../../abstract/tree/selectable-tree/selectable-tree.component';
+import { CategoryService } from 'src/app/services/category.service';
 
 /*
  * Category flat tree node to be used in the tree.
@@ -42,16 +43,17 @@ export class CategoryTreeComponent extends SelectableTreeComponent<Category, Cat
   private readonly DEFAULT_CATEGORY_DIALOG_WIDTH: string = '500px';
 
   /*
-   * Represents the if the edit button is enabled or not. 
+   * Indicates if a category is selected. It enables or disables buttons in the toolbar. 
    */
-  isEditButtonEnable: boolean = true;
+  isCategorySelected: boolean = true;
 
   /*
    * Represents a category flat list created from the tree.
    */
   categories: Category[];
     
-  constructor(private _categoryTreeService: CategoryTreeService,    
+  constructor(private _categoryTreeService: CategoryTreeService,
+    private _categoryService: CategoryService,    
     public dialog: MatDialog,
     private _snackBar: MatSnackBar) {    
       super();
@@ -105,25 +107,54 @@ export class CategoryTreeComponent extends SelectableTreeComponent<Category, Cat
     );
   }
 
-  /*
-   * It deletes the selected category.
-   */
-  //https://medium.com/@abshakekumar/snackbar-angular-material-component-with-multiple-actions-88ea3a9d3ddd
-  deleteCategory() {
+
+  deleteCategoryNode() {
     const category: Category = this._getSelectedCategory();
 
-    this._snackBar.open(`Delete category ${category.title}?`, 'Yes', { duration: 5000 }).onAction()
+    this._snackBar.open(`Delete category node ${category.title}?`, 'Yes', { duration: 5000 }).onAction()
       .pipe(
         untilDestroyed(this)
       )
       .subscribe(() => {
+        
+        this._categoryService.deleteEntity(category).pipe(
+          untilDestroyed(this)
+        )
+        .subscribe(tree => {
+          /* Clear the selected node deleted */
+          this.selection.clear();
+
+          this._snackBar.open(`Category node ${category.title} has been deleted!`);
+          this._loadTree();
+        });
+
+      }
+    );    
+  }
+
+  /*
+   * It deletes the selected category.
+   */
+  deleteCategoryTree() {
+    const category: Category = this._getSelectedCategory();
+
+    this._snackBar.open(`Delete category tree ${category.title}?`, 'Yes', { duration: 5000 }).onAction()
+      .pipe(
+        untilDestroyed(this)
+      )
+      .subscribe(() => {
+        
         this._categoryTreeService.deleteEntity(category).pipe(
           untilDestroyed(this)
         )
         .subscribe(tree => {
-          this._snackBar.open(`Category ${category.title} has been deleted!`);
+          /* Clear the selected node deleted */
+          this.selection.clear();
+          
+          this._snackBar.open(`Category tree ${category.title} has been deleted!`);
           this._loadTree();
         });
+
       }
     );
   }
@@ -138,7 +169,7 @@ export class CategoryTreeComponent extends SelectableTreeComponent<Category, Cat
         untilDestroyed(this)
       )
       .subscribe(item => {
-        this.isEditButtonEnable = this.selection.selected.length == 0;
+        this.isCategorySelected = this.selection.selected.length == 0;
       }
     );
   }
@@ -148,6 +179,9 @@ export class CategoryTreeComponent extends SelectableTreeComponent<Category, Cat
    */
   private _loadTree() {
 
+    const nodes : CategoryFlatNode[] = this.treeControl.expansionModel.selected.filter( c => c.isExpandable() );
+    console.log( nodes );
+    
     /* Loading the tree from the service */
     this._categoryTreeService.getEntities()
       .pipe(
@@ -159,7 +193,18 @@ export class CategoryTreeComponent extends SelectableTreeComponent<Category, Cat
 
         /* Converting the tree to a flat list, this will enabled the editing */
         this._toFlatList(tree);
-        this.treeControl.expansionModel.clear();        
+        this.treeControl.expansionModel.clear();
+
+        if( nodes && nodes.length > 0 ){
+          /* 
+           * If we tray to expand a node from the previous tree, it doesn't work, even if the object are equals.
+           * In order to expand the nodes expanded before, we need to search them into the treeControl and then 
+           * expand that.
+           */
+
+          //this.treeControl.dataNodes.filter(  )
+
+        }
       }
     );
   }
