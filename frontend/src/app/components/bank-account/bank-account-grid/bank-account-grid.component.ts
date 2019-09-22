@@ -19,7 +19,7 @@ export class BankAccountGridComponent implements OnInit, OnDestroy {
 
   selection = new SelectionModel<string>(false, []);
 
-  isEditButtonEnable: boolean = true;
+  isBankAccountSelected: boolean = true;
 
   bankAccounts : BankAccount[];
 
@@ -35,7 +35,7 @@ export class BankAccountGridComponent implements OnInit, OnDestroy {
     this.dataSource.sort = this.sort;
 
     this.selection.changed.pipe(untilDestroyed(this)).subscribe(item => {
-      this.isEditButtonEnable = this.selection.selected.length == 0;     
+      this.isBankAccountSelected = this.selection.selected.length == 0;     
     });
   }
 

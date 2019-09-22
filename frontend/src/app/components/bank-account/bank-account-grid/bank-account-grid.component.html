@@ -1,20 +1,23 @@
 <mat-toolbar>
-  <button mat-button (click)="newBankAccount()">
-    <mat-icon>add</mat-icon>New
-  </button>
-  <button mat-button [disabled]="isEditButtonEnable" (click)="editBankAccount()">
-    <mat-icon>edit</mat-icon>Edit
-  </button>
-  <button mat-button [disabled]="isEditButtonEnable" (click)="deleteBankAccount()">
-    <mat-icon>delete</mat-icon>Delete
-  </button>
+  <div fxLayoutAlign="start stretch" fxLayoutGap="8px">
+    <button mat-icon-button (click)="newBankAccount()" matTooltip="Create a new bank account">
+      <mat-icon>add</mat-icon>
+    </button>
+    <button mat-icon-button [disabled]="isBankAccountSelected" (click)="editBankAccount()"
+      matTooltip="Edit the selected bank account">
+      <mat-icon>edit</mat-icon>
+    </button>
+    <mat-divider [vertical]="true"></mat-divider>
+    <button mat-icon-button [disabled]="isBankAccountSelected" (click)="deleteBankAccount()"
+      matTooltip="Delete the selected bank account">
+      <mat-icon>delete</mat-icon>
+    </button>
+  </div>
 </mat-toolbar>
 
 <mat-card>
   <mat-card-title>Bank Accounts</mat-card-title>
   <mat-card-content>
-    
-    
     <table mat-table [dataSource]="dataSource" class="mat-elevation-z8" matSort>
 
       <!-- Checkbox Column -->
@@ -22,8 +25,7 @@
         <th mat-header-cell *matHeaderCellDef>
         </th>
         <td mat-cell *matCellDef="let row">
-          <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row.id) : null"
-            [checked]="selection.isSelected(row.id)">
+          <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row.id) : null" [checked]="selection.isSelected(row.id)">
           </mat-checkbox>
         </td>
       </ng-container>
@@ -49,6 +51,6 @@
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="selection.toggle(row.id)"></tr>
     </table>
-  
+
   </mat-card-content>
 </mat-card>

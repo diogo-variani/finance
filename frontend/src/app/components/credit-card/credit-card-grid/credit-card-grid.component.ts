@@ -19,7 +19,7 @@ export class CreditCardGridComponent  implements OnInit, OnDestroy {
 
   selection = new SelectionModel<string>(false, []);
 
-  isEditButtonEnable: boolean = true;
+  isCreditCardSelected: boolean = true;
 
   private _creditCards : CreditCard[];
 
@@ -35,7 +35,7 @@ export class CreditCardGridComponent  implements OnInit, OnDestroy {
     this.dataSource.sort = this.sort;
 
     this.selection.changed.pipe(untilDestroyed(this)).subscribe(item => {
-      this.isEditButtonEnable = this.selection.selected.length == 0;
+      this.isCreditCardSelected = this.selection.selected.length == 0;
     })
   }
 

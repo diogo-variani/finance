@@ -155,6 +155,12 @@ export abstract class DraggableTreeComponent<O, T extends FlatTreeNode> implemen
     
     if (flatNode !== this.dragFlatNode) {
       
+      /* If the are is above or below and the level is 0, it means the moved node should be a root. */
+      if( (this.dragNodeExpandOverArea == "above" || this.dragNodeExpandOverArea == "below") && 
+          this.dragNodeExpandOverNode.level == 0){
+            this.dragNodeExpandOverNode = null;
+      }
+
       /* Call save node */
       this.nodeMoved( this.dragNodeExpandOverNode, this.dragFlatNode );
       
