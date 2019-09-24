@@ -1,23 +1,23 @@
 <mat-toolbar>
-  <div fxLayoutAlign="start stretch" fxLayoutGap="8px">
-    <button mat-icon-button (click)="newCategory()" matTooltip="Create a new category">
-      <mat-icon>add</mat-icon>
-    </button>
-    <button mat-icon-button [disabled]="isCategorySelected" (click)="editCategory()" matTooltip="Edit the selected category">
-      <mat-icon>edit</mat-icon>
-    </button>
-    <mat-divider [vertical]="true"></mat-divider>
-    <button mat-icon-button [disabled]="isCategorySelected" (click)="deleteCategoryTree()" matTooltip="Delete the whole tree selected">
-      <mat-icon svgIcon="delete-tree"></mat-icon>
-    </button>
-    <button mat-icon-button [disabled]="isCategorySelected" (click)="deleteCategoryNode()" matTooltip="Delete the single node selected">
-      <mat-icon svgIcon="delete-node"></mat-icon>
-    </button>
-  </div>
+  <button mat-icon-button (click)="newCategory()" matTooltip="Create a new category">
+    <mat-icon>add</mat-icon>
+  </button>
+  <button mat-icon-button [disabled]="isCategorySelected" (click)="editCategory()" matTooltip="Edit the selected category">
+    <mat-icon>edit</mat-icon>
+  </button>
+  <mat-divider class="style-fix" [vertical]="true"></mat-divider>
+  <button mat-icon-button [disabled]="isCategorySelected" (click)="deleteCategoryTree()" matTooltip="Delete the whole tree selected">
+    <mat-icon svgIcon="delete-tree"></mat-icon>
+  </button>
+  <button mat-icon-button [disabled]="isCategorySelected" (click)="deleteCategoryNode()" matTooltip="Delete the single node selected">
+    <mat-icon svgIcon="delete-node"></mat-icon>
+  </button>
 </mat-toolbar>
+
 <mat-card>
   <mat-card-title>Categories</mat-card-title> 
   <mat-card-content>
+    
     <div>
       <mat-tree [dataSource]="dataSource" [treeControl]="treeControl" class="app-category-list">
 

@@ -1,17 +1,17 @@
-<mat-toolbar>
-  <button mat-button (click)="addMovement()">
-    <mat-icon>add</mat-icon>Add
+<mat-toolbar>    
+  <button mat-icon-button (click)="addMovement()"  matTooltip="Create a new movement">
+    <mat-icon>add</mat-icon>
   </button>
-  <button mat-button [disabled]="isEditButtonDisabled" (click)="editMovement();">
-    <mat-icon>edit</mat-icon>Edit
-  </button>
-  <button mat-button [disabled]="isDeleteButtonDisabled" (click)="deleteMovement();">
-    <mat-icon>delete</mat-icon>Delete
+  <button mat-icon-button [disabled]="isEditButtonDisabled" (click)="editMovement();" matTooltip="Edit the selected movement">
+    <mat-icon>edit</mat-icon>
   </button>
   <mat-divider class="style-fix" [vertical]="true"></mat-divider>
-
-  <button mat-button (click)="showFilter();">
-    <mat-icon>filter_list</mat-icon>Filter
+  <button mat-icon-button [disabled]="isDeleteButtonDisabled" (click)="deleteMovement();" matTooltip="Delete the selected movement">
+    <mat-icon>delete</mat-icon>
+  </button>
+  <mat-divider class="style-fix" [vertical]="true"></mat-divider>
+  <button mat-icon-button (click)="showFilter();" matTooltip="Filter movements">
+    <mat-icon>filter_list</mat-icon>
   </button>
 
 </mat-toolbar>
@@ -68,14 +68,14 @@
 
       <!-- Purchase Date -->
       <ng-container matColumnDef="purchaseDate">
-        <th mat-header-cell *matHeaderCellDef> Purchase Date </th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Purchase Date </th>
         <td mat-cell *matCellDef="let element"> {{element.purchaseDate | date: 'shortDate'}} </td>
         <td mat-footer-cell *matFooterCellDef></td>
       </ng-container>
 
       <!-- Payment Date -->
       <ng-container matColumnDef="paymentDate">
-        <th mat-header-cell *matHeaderCellDef> Payment Date </th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Payment Date </th>
         <td mat-cell *matCellDef="let element"> {{element.paymentDate | date: 'shortDate'}} </td>
         <td mat-footer-cell *matFooterCellDef></td>
       </ng-container>
@@ -89,7 +89,7 @@
 
       <!-- Debit -->
       <ng-container matColumnDef="debit">
-        <th mat-header-cell *matHeaderCellDef> Debit </th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Debit </th>
         <td mat-cell *matCellDef="let element"> {{element.isDebit ? 'Yes' : 'No'}} </td>
         <td mat-footer-cell *matFooterCellDef></td>
       </ng-container>
@@ -107,8 +107,8 @@
       <tr mat-row *matRowDef="let row; columns: getDisplayedColumns();" (click)="selection.toggle(row)"></tr>
       <tr mat-footer-row *matFooterRowDef="getDisplayedColumns();"></tr>
     </table>
-
-    <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+ 
+    <mat-paginator [pageSizeOptions]="[5, 10, 20]" [length]="dataSource.pagination?.totalElements" showFirstLastButtons></mat-paginator>
 
   </mat-card-content>
 </mat-card>

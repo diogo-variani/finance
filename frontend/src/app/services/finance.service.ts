@@ -20,6 +20,7 @@ export abstract class FinanceService<E extends FinanceEntity>{
   protected abstract getEndpoint() : string;
 
   getEntities() : Observable<E[]> {
+
     const endpoint : string = this.getEndpoint();
 
     return this.http.get<E[]>(endpoint).pipe(

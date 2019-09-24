@@ -11,6 +11,7 @@ import { CategoryTreeService } from 'src/app/services/category-tree.service';
 import { FlatTreeNode } from '../../abstract/tree/draggable-tree/draggable-tree.component';
 import { SelectableTreeComponent } from '../../abstract/tree/selectable-tree/selectable-tree.component';
 import { CategoryService } from 'src/app/services/category.service';
+import { delay } from 'rxjs/operators';
 
 /*
  * Category flat tree node to be used in the tree.
@@ -173,7 +174,7 @@ export class CategoryTreeComponent extends SelectableTreeComponent<Category, Cat
       }
     );
   }
-
+  
   /*
    * It loads the category tree from an external service.
    */
@@ -185,7 +186,8 @@ export class CategoryTreeComponent extends SelectableTreeComponent<Category, Cat
     /* Loading the tree from the service */
     this._categoryTreeService.getEntities()
       .pipe(
-        untilDestroyed(this)
+        untilDestroyed(this),
+        delay( 2000 )
       )
       .subscribe(tree => {
         this.dataSource.data = [];

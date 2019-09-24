@@ -1,16 +1,17 @@
 <mat-toolbar>
-  <div fxLayoutAlign="start stretch" fxLayoutGap="8px">
-    <button mat-icon-button (click)="newCreditCard()" matTooltip="Create a new credit card">
-      <mat-icon>add</mat-icon>
-    </button>
-    <button mat-icon-button [disabled]="isCreditCardSelected" (click)="editCreditCard()" matTooltip="Edit the selected credit card">
-      <mat-icon>edit</mat-icon>
-    </button>
-    <mat-divider [vertical]="true"></mat-divider>
-    <button mat-icon-button [disabled]="isCreditCardSelected" (click)="deleteCreditCard()" matTooltip="Delete the selected credit card">
-      <mat-icon>delete</mat-icon>
-    </button>
-  </div>
+  <button mat-icon-button (click)="newCreditCard()" matTooltip="Create a new credit card">
+    <mat-icon>add</mat-icon>
+  </button>
+  <button mat-icon-button [disabled]="isCreditCardSelected" (click)="editCreditCard()"
+    matTooltip="Edit the selected credit card">
+    <mat-icon>edit</mat-icon>
+  </button>
+  <mat-divider class="style-fix" [vertical]="true"></mat-divider>
+  <button mat-icon-button [disabled]="isCreditCardSelected" (click)="deleteCreditCard()"
+    matTooltip="Delete the selected credit card">
+    <mat-icon>delete</mat-icon>
+  </button>
+
 </mat-toolbar>
 
 <mat-card>

@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import javax.validation.ValidationException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -39,6 +41,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 		
 		return createDefaultErrorMessage("Payload is not valid", status, errors);
 	}
+	
+	@ExceptionHandler(value= {ValidationException.class})
+	protected ResponseEntity<Object> handleValidationException(ValidationException ex, WebRequest request){
+        return createDefaultErrorMessage(ex, HttpStatus.BAD_REQUEST);
+    }
 	
 	@ExceptionHandler(value= {EntityNotFoundException.class})
 	protected ResponseEntity<Object> handleNotFoundException(Exception ex, WebRequest request){

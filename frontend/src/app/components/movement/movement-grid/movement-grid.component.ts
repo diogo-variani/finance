@@ -1,12 +1,12 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { MatDialog, MatSort, MatTableDataSource, MatSnackBar } from '@angular/material';
+//https://blog.angular-university.io/angular-material-data-table/
+import { Component, OnInit, ViewChild, AfterViewInit, OnDestroy } from '@angular/core';
+import { MatDialog, MatSort, MatSnackBar } from '@angular/material';
 import {MatPaginator} from '@angular/material/paginator';
 
 import { MovementDialogComponent } from '../movement-dialog/movement-dialog.component';
 import { MovementService } from 'src/app/services/movement.service';
 import { Movement } from 'src/app/models/movement';
 import { SelectionModel } from '@angular/cdk/collections';
-import { CategoryTreeService } from 'src/app/services/category-tree.service';
 import { Category } from 'src/app/models/category';
 import { BankAccount } from 'src/app/models/bank-account';
 import { BankAccountService } from 'src/app/services/bank-account.service';
@@ -16,14 +16,18 @@ import { MovementFilterComponent } from '../movement-filter/movement-filter.comp
 import * as moment from 'moment';
 import { MovementFilter, MONTHS } from 'src/app/models/movement-filter';
 import { untilDestroyed } from 'ngx-take-until-destroy';
+import { MovementDataSource } from 'src/app/datasource/movement/movement.datasource';
+import { tap } from 'rxjs/operators';
+import { merge } from 'rxjs/internal/observable/merge';
+import { CategoryService } from 'src/app/services/category.service';
 
 @Component({
   selector: 'app-movement-grid',
   templateUrl: './movement-grid.component.html',
   styleUrls: ['./movement-grid.component.scss']
 })
-export class MovementGridComponent implements OnInit {
-
+export class MovementGridComponent implements AfterViewInit, OnInit, OnDestroy {
+  
   private _categories = new Map<string, Category>();
   private _bankAccounts = new Map<string, BankAccount>();
   private _creditCards = new Map<string, CreditCard>();
@@ -50,7 +54,7 @@ export class MovementGridComponent implements OnInit {
 
   isDeleteButtonDisabled: boolean = true;
 
-  dataSource: MatTableDataSource<Movement> = new MatTableDataSource();
+  dataSource: MovementDataSource;
 
   selection = new SelectionModel<Movement>(true, []);
 
@@ -61,21 +65,26 @@ export class MovementGridComponent implements OnInit {
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
 
   constructor( public dialog: MatDialog,
-               private _categoryService: CategoryTreeService,
+               private _categoryService: CategoryService,
                private _bankAccountService: BankAccountService,
                private _creditCardService: CreditCardService,
                private _movementService: MovementService,
                private _snackBar: MatSnackBar ) { 
+    
   }
 
   ngOnInit() {
-    this._movementService.getEntities().pipe(untilDestroyed(this)).subscribe(data => {
+
+    this.dataSource = new MovementDataSource( this._movementService );
+    this.dataSource.loadMovements(0, 5);
+
+    /*this._movementService.getEntities().pipe(untilDestroyed(this)).subscribe(data => {
       this.dataSource.data = [];
       this.dataSource.data = data;
 
       this.totalCost = data.map(t => t).reduce((acc, movement) => movement.isDebit? acc - movement.value : acc + movement.value, 0);
     });
-    this.dataSource.sort = this.sort;
+    this.dataSource.sort = this.sort;*/
 
     this._categoryService.getEntities().pipe(untilDestroyed(this)).subscribe(categories => {
       this._categories.clear();
@@ -103,7 +112,26 @@ export class MovementGridComponent implements OnInit {
       this.isDeleteButtonDisabled = this.selection.selected.length == 0;
     }); 
 
-    this.dataSource.paginator = this.paginator;
+    //this.dataSource.paginator = this.paginator;
+  }
+
+  ngOnDestroy(): void {    
+  }
+
+  ngAfterViewInit() {
+
+    // reset the paginator after sorting
+    this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0);
+        
+    merge(this.sort.sortChange, this.paginator.page)
+      .pipe(
+          tap(() => this.loadMovementsPage())
+      )
+      .subscribe();   
+  }
+
+  loadMovementsPage(){    
+    this.dataSource.loadMovements( this.paginator.pageIndex, this.paginator.pageSize, this.sort.active, this.sort.direction );
   }
 
   addMovement() {

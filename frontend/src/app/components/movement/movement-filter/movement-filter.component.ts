@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit, Inject, OnDestroy } from '@angular/core';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { CategoryTreeService } from 'src/app/services/category-tree.service';
@@ -12,8 +12,8 @@ import { MovementFilter, MONTHS } from '../../../models/movement-filter';
   templateUrl: './movement-filter.component.html',
   styleUrls: ['./movement-filter.component.scss']
 })
-export class MovementFilterComponent extends MovementFormAbstract implements OnInit {
-
+export class MovementFilterComponent extends MovementFormAbstract implements OnInit, OnDestroy {
+  
   movementFilterFormGroup: FormGroup;
 
   months = MONTHS;
@@ -57,6 +57,9 @@ export class MovementFilterComponent extends MovementFormAbstract implements OnI
 
   ngOnInit() {
     super.ngOnInit();
+  }
+
+  ngOnDestroy(): void {    
   }
 
   resetForm(){
