@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.data.domain.Page;
-import org.springframework.hateoas.Link;
 
 public class PageResponseBuilder {
 		
@@ -49,17 +48,6 @@ public class PageResponseBuilder {
 	
 	public PageResponseBuilder data( Object data ) {
 		map.put("data", data);
-		return this;
-	}
-	
-	public PageResponseBuilder link(Link link) {
-		if( link == null ) {
-			return this;
-		}
-		
-		Map<String, Object> links = getOrCreate("links");
-		links.put( link.getRel(), link.getHref() );	
-		
 		return this;
 	}
 	

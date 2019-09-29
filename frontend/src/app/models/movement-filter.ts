@@ -8,6 +8,9 @@ export class MovementFilter {
   purchaseMonth? : number;
   purchaseYear? : number;
 
+  initialValue? : number;
+  finalValue? : number;
+
   paymentInitialDate? : Date;
   paymentFinalDate? : Date;
   paymentMonth? : number;

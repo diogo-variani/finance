@@ -25,6 +25,10 @@ import { MovementFilterComponent } from './components/movement/movement-filter/m
 
 
 import { HttpClientModule } from '@angular/common/http';
+import { EditableComponent } from './components/shared/editable/editable.component';
+import { ViewModeDirective } from './components/shared/editable/view-mode.directive';
+import { EditModeDirective } from './components/shared/editable/edit-mode.directive';
+import { EditableOnEnterDirective } from './components/shared/editable/editable-on-enter.directive';
 
 @NgModule({
   declarations: [
@@ -40,7 +44,11 @@ import { HttpClientModule } from '@angular/common/http';
     CreditCardGridComponent,
     MovementGridComponent,
     MovementDialogComponent,
-    MovementFilterComponent
+    MovementFilterComponent,
+    EditableComponent,
+    ViewModeDirective,
+    EditModeDirective,    
+    EditableOnEnterDirective
   ],
   imports: [
     HttpClientModule,

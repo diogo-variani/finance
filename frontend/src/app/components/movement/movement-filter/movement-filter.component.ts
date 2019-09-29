@@ -1,11 +1,11 @@
 import { Component, OnInit, Inject, OnDestroy } from '@angular/core';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
-import { CategoryTreeService } from 'src/app/services/category-tree.service';
 import { BankAccountService } from 'src/app/services/bank-account.service';
 import { CreditCardService } from 'src/app/services/credit-card.service';
 import { MovementFormAbstract } from '../../abstract/movement-form-abstract.component';
 import { MovementFilter, MONTHS } from '../../../models/movement-filter';
+import { CategoryService } from 'src/app/services/category.service';
 
 @Component({
   selector: 'app-movement-filter',
@@ -23,7 +23,7 @@ export class MovementFilterComponent extends MovementFormAbstract implements OnI
   constructor(public dialogRef: MatDialogRef<MovementFilterComponent>,
     private _formBuilder: FormBuilder,
     @Inject(MAT_DIALOG_DATA) public data: MovementFilter,
-    protected _categoryService: CategoryTreeService,
+    protected _categoryService: CategoryService,
     protected _bankAccountService: BankAccountService,
     protected _creditCardService: CreditCardService) {
 
@@ -40,6 +40,8 @@ export class MovementFilterComponent extends MovementFormAbstract implements OnI
         paymentMonth: [this.data ? this.data.paymentMonth : null],
         paymentYear: [this.data ? this.data.paymentYear : null],
         store: [this.data ? this.data.store : null],
+        initialValue : [this.data ? this.data.initialValue : null],
+        finalValue : [this.data ? this.data.finalValue : null],
         categories: [this.data && this.data.categories ? this.data.categories.map(c => c.id) : null],
         bankAccounts: [this.data && this.data.bankAccounts ? this.data.bankAccounts.map(b => b.id) : null],
         creditCards: [this.data && this.data.creditCards  ? this.data.creditCards.map(c => c.id) : null]
@@ -74,6 +76,9 @@ export class MovementFilterComponent extends MovementFormAbstract implements OnI
       bankAccounts : controls.bankAccounts.value ? controls.bankAccounts.value.map( (bankAccountId: string) => this._getBankAccount( bankAccountId ) ) : null,
       categories : controls.categories.value ? controls.categories.value.map( (categoriesId: string) => this._getCategory( categoriesId ) ) : null,
       creditCards : controls.creditCards.value ? controls.creditCards.value.map( (creditCardId: string) => this._getCreditCard( creditCardId ) ) : null,
+
+      initialValue : controls.initialValue.value,
+      finalValue : controls.finalValue.value,
 
       paymentFinalDate : controls.paymentFinalDate.value,
       paymentInitialDate : controls.paymentInitialDate.value,

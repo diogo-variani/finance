@@ -1,3 +1,4 @@
+//https://github.com/eugenp/tutorials/tree/master/spring-rest-query-language
 package com.finance.domain;
 
 import java.math.BigDecimal;
@@ -17,6 +18,7 @@ import com.finance.constraint.DateAfter;
 
 @DateAfter(base = "purchaseDate", toCheck = "paymentDate", message = "The paymentDate must be equals or after than purchaseDate")
 @Document(collection = "movements")
+//@Entity
 public class Movement extends BaseEntity {
 
 	@NotEmpty(message = "The store must be specified")

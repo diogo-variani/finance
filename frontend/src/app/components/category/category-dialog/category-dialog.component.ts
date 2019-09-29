@@ -150,9 +150,14 @@ export class CategoryDialogComponent implements OnInit, OnDestroy {
     });
   }
 
-  addSubCategory(){    
-    const newFormControl : AbstractControl = this._toFormGroup();
-    (<FormArray>this.categoryFormGroup.controls['subCategories']).push( newFormControl );
+  addSubCategory(){        
+    (<FormArray>this.categoryFormGroup.controls['subCategories']).push( 
+      this._formBuilder.group({
+        id: [null],
+        title: ['', Validators.required],
+        description: [null]
+      })
+     );
   }
 
   removeSubCategory( index: number ){
@@ -199,16 +204,12 @@ export class CategoryDialogComponent implements OnInit, OnDestroy {
       return [];
     }
 
-    return subCategories.map(
-      this._toFormGroup
+    return subCategories.map( 
+      category => this._formBuilder.group({
+        id: [category ? category.id : null],
+        title: [category ? category.title : '', Validators.required],
+        description: [category ? category.description : null]
+      })
     );
-  }
-
-  private _toFormGroup( category? : Category ) : FormGroup {
-    return new FormGroup({
-      id: new FormControl(category ? category.id : null),
-      title: new FormControl(category ? category.title : '', Validators.required),
-      description: new FormControl(category ? category.description : null)
-    });
-  }
+  }  
 }

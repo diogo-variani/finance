@@ -1,6 +1,5 @@
-import { Component, OnInit, Inject, ElementRef, ViewChild } from '@angular/core';
+import { Component, OnInit, Inject, ElementRef, ViewChild, OnDestroy } from '@angular/core';
 import { BankAccountService } from 'src/app/services/bank-account.service';
-import { CategoryTreeService } from 'src/app/services/category-tree.service';
 import { Category } from 'src/app/models/category';
 import { BankAccount } from 'src/app/models/bank-account';
 import { FormGroup, FormBuilder, Validators, ValidationErrors } from '@angular/forms';
@@ -11,16 +10,18 @@ import { CreditCardService } from 'src/app/services/credit-card.service';
 import { MatDialogRef, MAT_DIALOG_DATA, MatSnackBar } from '@angular/material';
 import { MovementService } from 'src/app/services/movement.service';
 import { Movement } from 'src/app/models/movement';
-import { MovementFormAbstract } from '../../abstract/movement-form-abstract.component';
 import { untilDestroyed } from 'ngx-take-until-destroy';
+import { CategoryService } from 'src/app/services/category.service';
+import { MovementFormAbstract } from '../../abstract/movement-form-abstract.component';
+import { MovementFilter } from 'src/app/models/movement-filter';
 
 @Component({
   selector: 'app-movement-dialog',
   templateUrl: './movement-dialog.component.html',
   styleUrls: ['./movement-dialog.component.scss']
 })
-export class MovementDialogComponent extends MovementFormAbstract implements OnInit {
-
+export class MovementDialogComponent extends MovementFormAbstract implements OnInit, OnDestroy {
+  
   validationMessages = {
     'store': [
       { type: 'required', message: 'Store is required' }
@@ -49,7 +50,7 @@ export class MovementDialogComponent extends MovementFormAbstract implements OnI
 
   @ViewChild('storeInput', {static: false}) storeInput: ElementRef;
 
-  constructor(protected _categoryService: CategoryTreeService,
+  constructor(protected _categoryService: CategoryService,
     protected _bankAccountService: BankAccountService,
     protected _creditCardService: CreditCardService,
     private _movementService: MovementService,
@@ -75,51 +76,57 @@ export class MovementDialogComponent extends MovementFormAbstract implements OnI
   }
 
   ngOnInit() {
-    super.ngOnInit();
 
     this._categoryService.getEntities().pipe(untilDestroyed(this)).subscribe(data => {
-      if( this.categories ){
-        const category : Category = this.data ? this._getCategory( this.data.categoryId ) : null;
-        this.movementFormGroup.controls.category.setValue( category );
-      }
-    });
+      this.categories = data;
 
-    this._bankAccountService.getEntities().pipe(untilDestroyed(this)).subscribe(data => {
-      if( this.bankAccounts ){
-        const bankAccount : BankAccount = this.data ? this._getBankAccount( this.data.bankAccountId ) : null;
-        this.movementFormGroup.controls.bankAccount.setValue( bankAccount );
-      }
-    });
-
-    this._creditCardService.getEntities().pipe(untilDestroyed(this)).subscribe(data => {
-      if( this.creditCards ){
-        const creditCard : CreditCard = this.data ? this._getCreditCard( this.data.creditCardId ) : null;
-        this.movementFormGroup.controls.creditCard.setValue( creditCard );
-      }
-    });    
-
-    this.categoryFiltered = this.movementFormGroup.controls.category.valueChanges
+      /* Sets the movement category into the formgroup. */
+      const category : Category = this.data ? this._getCategory( this.data.categoryId ) : null;
+      this.movementFormGroup.controls.category.setValue( category );
+      
+      this.categoryFiltered = this.movementFormGroup.controls.category.valueChanges
       .pipe(
         startWith(''),
         map(value => typeof value === 'string' ? value : value.title),
         map(title => title ? this._filterCategory(title) : this.categories.slice())
       );
 
-    this.bankAccountFiltered = this.movementFormGroup.controls.bankAccount.valueChanges
-      .pipe(
-        startWith(''),
-        map(value => typeof value === 'string' ? value : value.bankName),      
-        map(bankName => bankName ? this._filterBankAccount(bankName) : this.bankAccounts.slice())
-      );
+    });
 
-      this.creditCardFiltered = this.movementFormGroup.controls.creditCard.valueChanges
-      .pipe(
-        startWith(''),
-        map(value => typeof value === 'string' ? value : value.name),      
-        map(creditCard => creditCard ? this._filterCreditCard(creditCard) : this.creditCards.slice())
-      );
+    this._bankAccountService.getEntities().pipe(untilDestroyed(this)).subscribe(data => {
+        this.bankAccounts = data;
 
+        /* Sets the movement bank account into the formgroup */
+        const bankAccount : BankAccount = this.data ? this._getBankAccount( this.data.bankAccountId ) : null;
+        this.movementFormGroup.controls.bankAccount.setValue( bankAccount );
+
+
+        this.bankAccountFiltered = this.movementFormGroup.controls.bankAccount.valueChanges
+        .pipe(
+          startWith(''),
+          map(value => typeof value === 'string' ? value : value.bankName),      
+          map(bankName => bankName ? this._filterBankAccount(bankName) : this.bankAccounts.slice())
+        );        
+    });
+
+    this._creditCardService.getEntities().pipe(untilDestroyed(this)).subscribe(data => {
+        this.creditCards = data;
+
+        /* Sets the movement credit card  into the form group */
+        const creditCard : CreditCard = this.data ? this._getCreditCard( this.data.creditCardId ) : null;
+        this.movementFormGroup.controls.creditCard.setValue( creditCard );
+
+        this.creditCardFiltered = this.movementFormGroup.controls.creditCard.valueChanges
+        .pipe(
+          startWith(''),
+          map(value => typeof value === 'string' ? value : value.name),      
+          map(creditCard => creditCard ? this._filterCreditCard(creditCard) : this.creditCards.slice())
+        );        
+    });
   }
+
+  ngOnDestroy(): void {   
+  }  
 
   displayCategory(category: Category): string | undefined {
     return category ? category.title : undefined;
@@ -151,7 +158,7 @@ export class MovementDialogComponent extends MovementFormAbstract implements OnI
     return this.creditCards.filter(creditCard => creditCard.name.toLowerCase().indexOf(filterValue) === 0);    
   }
 
-  private _saveCurrentMovement() : Movement {
+  private _saveCurrentMovement() : Observable<Movement> {
     const category : Category = this.movementFormGroup.controls.category.value;
     const bankAccount : BankAccount = this.movementFormGroup.controls.bankAccount.value;
     const creditCard : CreditCard = this.movementFormGroup.controls.creditCard.value;
@@ -168,21 +175,13 @@ export class MovementDialogComponent extends MovementFormAbstract implements OnI
       isDebit: this.movementFormGroup.controls.debit.value
     }
 
-    this._movementService.saveEntity(movement);
-    return movement;
+    return this._movementService.saveEntity(movement);    
   }
 
-  addMovement(){
-    const movement : Movement = this._saveCurrentMovement();
-    this._snackBar.open(`Movement ${movement.store} (${movement.value}) has been ${this.data.id ? 'edited' : 'created'} successfully!`);
-    this.movementFormGroup.reset();
-    this.storeInput.nativeElement.focus();
-    
-  }
-
-  addMovementAndClose(){
-    const movement : Movement = this._saveCurrentMovement();
-    this._snackBar.open(`Movement ${movement.store} (${movement.value}) has been ${this.data.id ? 'edited' : 'created'} successfully!`);
-    this.dialogRef.close();
+  saveMovement(){
+    this._saveCurrentMovement().subscribe( movement => {
+      this._snackBar.open(`Movement ${movement.store} (${movement.value}) has been ${this.data ? 'edited' : 'created'} successfully!`);
+      this.dialogRef.close(movement);
+    });
   }
 }

@@ -6,7 +6,8 @@
       <mat-tab-group>
         <mat-tab label="General">
 
-          <div gdAreas="store | categories | bankAccounts | creditCards" gdGap="16px" gdRows="auto auto auto auto" class="filterContent">
+          <div gdAreas="store | categories | bankAccounts | creditCards " gdGap="16px" gdRows="auto auto auto auto"
+            class="filterContent">
 
             <mat-form-field gdArea="store">
               <input matInput placeholder="Store" formControlName="store">
@@ -22,88 +23,112 @@
             <mat-form-field gdArea="bankAccounts">
               <mat-label>Bank Account</mat-label>
               <mat-select formControlName="bankAccounts" multiple>
-                <mat-option *ngFor="let bankAccount of bankAccounts" [value]="bankAccount.id">{{bankAccount.name}}</mat-option>
+                <mat-option *ngFor="let bankAccount of bankAccounts" [value]="bankAccount.id">{{bankAccount.name}}
+                </mat-option>
               </mat-select>
-            </mat-form-field>            
+            </mat-form-field>
 
             <mat-form-field gdArea="creditCards">
               <mat-label>Credit Card</mat-label>
               <mat-select formControlName="creditCards" multiple>
-                <mat-option *ngFor="let creditCard of creditCards" [value]="creditCard.id">{{creditCard.name}}</mat-option>
+                <mat-option *ngFor="let creditCard of creditCards" [value]="creditCard.id">{{creditCard.name}}
+                </mat-option>
               </mat-select>
-            </mat-form-field>            
+            </mat-form-field>
 
           </div>
         </mat-tab>
 
+        <mat-tab label="Value">
+
+          <div gdAreas="initialValue | finalValue" gdGap="16px" gdRows="auto auto" class="filterContent">
+
+            <mat-form-field gdArea="initialValue">
+              <input matInput type="number" currency-mask class="right-align" placeholder="Initial Value"
+                formControlName="initialValue">
+              <span matPrefix>€&nbsp;</span>
+            </mat-form-field>
+
+            <mat-form-field gdArea="finalValue">
+              <input matInput type="number" currency-mask class="right-align" placeholder="Final Value"
+                formControlName="finalValue">
+              <span matPrefix>€&nbsp;</span>
+            </mat-form-field>
+
+          </div>
+
+        </mat-tab>
+
         <mat-tab label="Purchase Date">
 
-            <div gdAreas="purchaseInitialDate purchaseFinalDate | purchaseMonth purchaseYear" gdGap="16px"
-              gdRows="auto auto" class="filterContent">
-  
-              <mat-form-field gdArea="purchaseInitialDate">
-                <input matInput [matDatepicker]="purchaseInitialDate" placeholder="Initial Date" formControlName="purchaseInitialDate">
-                <mat-datepicker-toggle matSuffix [for]="purchaseInitialDate"></mat-datepicker-toggle>
-                <mat-datepicker #purchaseInitialDate></mat-datepicker>
-              </mat-form-field>
-  
-              <mat-form-field gdArea="purchaseFinalDate">
-                <input matInput [matDatepicker]="purchaseFinalDate" [min]="minDate" placeholder="Final Date" formControlName="purchaseFinalDate">              
-                <mat-datepicker-toggle matSuffix [for]="purchaseFinalDate"></mat-datepicker-toggle>
-                <mat-datepicker #purchaseFinalDate ></mat-datepicker>
-              </mat-form-field>
-  
-              <mat-form-field gdArea="purchaseMonth">
-                <mat-label>Month</mat-label>
-                <mat-select formControlName="purchaseMonth">                
-                  <mat-option *ngFor="let month of months" [value]="month.index">
-                    {{month.description}}
-                  </mat-option>
-                </mat-select>
-              </mat-form-field>
-  
-              <mat-form-field gdArea="purchaseYear">
-                <input matInput placeholder="Year" type="number" formControlName="purchaseYear">
-              </mat-form-field>
-  
-            </div>
-  
-          </mat-tab>
-          <mat-tab label="Payment Date">
-  
-            <div gdAreas="paymentInitialDate paymentFinalDate | paymentMonth paymentYear" gdGap="16px" gdRows="auto auto"
-              class="filterContent">
-  
-              <mat-form-field gdArea="paymentInitialDate">
-                <input matInput [matDatepicker]="paymentInitialDate" placeholder="Initial Date"
-                  formControlName="paymentInitialDate">
-                <mat-datepicker-toggle matSuffix [for]="paymentInitialDate"></mat-datepicker-toggle>
-                <mat-datepicker #paymentInitialDate></mat-datepicker>
-              </mat-form-field>
-  
-              <mat-form-field gdArea="paymentFinalDate">
-                <input matInput [matDatepicker]="paymentFinalDate" placeholder="Final Date"
-                  formControlName="paymentFinalDate">
-                <mat-datepicker-toggle matSuffix [for]="paymentFinalDate"></mat-datepicker-toggle>
-                <mat-datepicker #paymentFinalDate></mat-datepicker>
-              </mat-form-field>
-  
-              <mat-form-field gdArea="paymentMonth">
-                <mat-label>Month</mat-label>
-                <mat-select formControlName="paymentMonth">
-                  <mat-option *ngFor="let month of months" [value]="month.index">
-                    {{month.description}}
-                  </mat-option>
-                </mat-select>
-              </mat-form-field>
-  
-              <mat-form-field gdArea="paymentYear">
-                <input matInput placeholder="Year" type="number" formControlName="paymentYear">
-              </mat-form-field>
-  
-            </div>
-  
-          </mat-tab>
+          <div gdAreas="purchaseInitialDate purchaseFinalDate | purchaseMonth purchaseYear" gdGap="16px"
+            gdRows="auto auto" class="filterContent">
+
+            <mat-form-field gdArea="purchaseInitialDate">
+              <input matInput [matDatepicker]="purchaseInitialDate" placeholder="Initial Date"
+                formControlName="purchaseInitialDate">
+              <mat-datepicker-toggle matSuffix [for]="purchaseInitialDate"></mat-datepicker-toggle>
+              <mat-datepicker #purchaseInitialDate></mat-datepicker>
+            </mat-form-field>
+
+            <mat-form-field gdArea="purchaseFinalDate">
+              <input matInput [matDatepicker]="purchaseFinalDate" [min]="minDate" placeholder="Final Date"
+                formControlName="purchaseFinalDate">
+              <mat-datepicker-toggle matSuffix [for]="purchaseFinalDate"></mat-datepicker-toggle>
+              <mat-datepicker #purchaseFinalDate></mat-datepicker>
+            </mat-form-field>
+
+            <mat-form-field gdArea="purchaseMonth">
+              <mat-label>Month</mat-label>
+              <mat-select formControlName="purchaseMonth">
+                <mat-option *ngFor="let month of months" [value]="month.index">
+                  {{month.description}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field gdArea="purchaseYear">
+              <input matInput placeholder="Year" type="number" formControlName="purchaseYear">
+            </mat-form-field>
+
+          </div>
+
+        </mat-tab>
+        <mat-tab label="Payment Date">
+
+          <div gdAreas="paymentInitialDate paymentFinalDate | paymentMonth paymentYear" gdGap="16px" gdRows="auto auto"
+            class="filterContent">
+
+            <mat-form-field gdArea="paymentInitialDate">
+              <input matInput [matDatepicker]="paymentInitialDate" placeholder="Initial Date"
+                formControlName="paymentInitialDate">
+              <mat-datepicker-toggle matSuffix [for]="paymentInitialDate"></mat-datepicker-toggle>
+              <mat-datepicker #paymentInitialDate></mat-datepicker>
+            </mat-form-field>
+
+            <mat-form-field gdArea="paymentFinalDate">
+              <input matInput [matDatepicker]="paymentFinalDate" placeholder="Final Date"
+                formControlName="paymentFinalDate">
+              <mat-datepicker-toggle matSuffix [for]="paymentFinalDate"></mat-datepicker-toggle>
+              <mat-datepicker #paymentFinalDate></mat-datepicker>
+            </mat-form-field>
+
+            <mat-form-field gdArea="paymentMonth">
+              <mat-label>Month</mat-label>
+              <mat-select formControlName="paymentMonth">
+                <mat-option *ngFor="let month of months" [value]="month.index">
+                  {{month.description}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field gdArea="paymentYear">
+              <input matInput placeholder="Year" type="number" formControlName="paymentYear">
+            </mat-form-field>
+
+          </div>
+
+        </mat-tab>
 
       </mat-tab-group>
 

@@ -4,16 +4,17 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { CollectionViewer } from '@angular/cdk/collections';
 import { MovementService } from 'src/app/services/movement.service';
 import { finalize } from 'rxjs/operators';
-import { PaginationResponse } from 'src/app/models/pagination/pagination-response';
 import { Pagination } from 'src/app/models/pagination/pagination';
+import { MovementFilter } from 'src/app/models/movement-filter';
 
 export class MovementDataSource implements DataSource<Movement>{
 
-    private movementSubject = new BehaviorSubject<Movement[]>([]);
-    private loadingSubject = new BehaviorSubject<boolean>(false);
+    movementSubject = new BehaviorSubject<Movement[]>([]);
+    paginationSubject = new BehaviorSubject<Pagination>({} as Pagination);
+    loadingSubject = new BehaviorSubject<boolean>(false);
 
     data : Movement[];
-    pagination : Pagination;
+    page : Pagination;
 
     constructor(private movementService : MovementService){        
     }
@@ -27,16 +28,17 @@ export class MovementDataSource implements DataSource<Movement>{
         this.loadingSubject.complete();
     }
 
-    loadMovements( page? : number, size? : number, sortBy? : string, sortDir? : string ){
+    loadMovements( page? : number, size? : number, sortBy? : string, sortDir? : string, movementFilter? : MovementFilter ){
         this.loadingSubject.next(true);
 
-        this.movementService.getMovements( page, size, sortBy, sortDir )
+        this.movementService.getMovements( page, size, sortBy, sortDir, movementFilter )
             .pipe(
                 finalize(() => this.loadingSubject.next(false))
             )
             .subscribe(pageResponse =>{ 
                 this.data = pageResponse.data;
-                this.pagination = pageResponse.page;
+                this.page = pageResponse.page;
+                this.paginationSubject.next(pageResponse.page);
                 this.movementSubject.next(pageResponse.data);
             });
     }

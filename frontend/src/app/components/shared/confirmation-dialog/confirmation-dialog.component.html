@@ -1,8 +1,0 @@
-<div mat-dialog-content>
-    {{dataInput.message}}
-</div>
-<div mat-dialog-actions>
-
-    <button *ngFor="let button of dataInput.buttons" mat-button (click)="buttonClick(button.identifier)">{{button.label}}</button>
-    
-</div>

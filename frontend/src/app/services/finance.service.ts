@@ -49,7 +49,7 @@ export abstract class FinanceService<E extends FinanceEntity>{
     return this.http.put<E>(url, entity, this.httpOptions);   
   }
 
-  deleteEntity(entity: E)  : Observable<E> {
+  deleteEntity(entity: E)  : Observable<any> {
     if (!entity.id) {
       return;
     }
@@ -57,6 +57,6 @@ export abstract class FinanceService<E extends FinanceEntity>{
     const endpoint : string = this.getEndpoint();
     const url = `${endpoint}/${entity.id}`;
 
-    return this.http.delete<E>(url, this.httpOptions);
+    return this.http.delete<any>(url, this.httpOptions);
   }  
 }

@@ -2,20 +2,20 @@ import { OnInit } from '@angular/core';
 import { CreditCard } from 'src/app/models/credit-card';
 import { BankAccount } from 'src/app/models/bank-account';
 import { Category } from 'src/app/models/category';
-import { CategoryTreeService } from 'src/app/services/category-tree.service';
 import { BankAccountService } from 'src/app/services/bank-account.service';
 import { CreditCardService } from 'src/app/services/credit-card.service';
 import { untilDestroyed } from 'ngx-take-until-destroy';
+import { CategoryService } from 'src/app/services/category.service';
 
 export abstract class MovementFormAbstract implements OnInit {
 
-    categories: Category[];
+    protected categories: Category[];
 
-    bankAccounts: BankAccount[];
+    protected bankAccounts: BankAccount[];
 
-    creditCards: CreditCard[];
+    protected creditCards: CreditCard[];
 
-    constructor(protected _categoryService: CategoryTreeService,
+    constructor(protected _categoryService: CategoryService,
         protected _bankAccountService: BankAccountService,
         protected _creditCardService: CreditCardService) {
     }

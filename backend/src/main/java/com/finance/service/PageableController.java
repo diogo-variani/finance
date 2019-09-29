@@ -17,9 +17,9 @@ import com.finance.domain.BaseEntity;
 
 public abstract class PageableController {
 	
-	public static final int DEFAULT_PAGE = 0;
+	public static final Integer DEFAULT_PAGE = 0;
 	
-	public static final int DEFAULT_SIZE = 10;
+	public static final Integer DEFAULT_SIZE = 10;
 	
 	public static final Direction DEFAULT_SORT_DIRECTION = Sort.Direction.ASC;
 	

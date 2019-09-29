@@ -1,6 +1,6 @@
 //https://blog.angular-university.io/angular-material-data-table/
 import { Component, OnInit, ViewChild, AfterViewInit, OnDestroy } from '@angular/core';
-import { MatDialog, MatSort, MatSnackBar } from '@angular/material';
+import { MatDialog, MatSort, MatSnackBar, MatDialogConfig } from '@angular/material';
 import {MatPaginator} from '@angular/material/paginator';
 
 import { MovementDialogComponent } from '../movement-dialog/movement-dialog.component';
@@ -20,6 +20,7 @@ import { MovementDataSource } from 'src/app/datasource/movement/movement.datasou
 import { tap } from 'rxjs/operators';
 import { merge } from 'rxjs/internal/observable/merge';
 import { CategoryService } from 'src/app/services/category.service';
+import { Pagination } from 'src/app/models/pagination/pagination';
 
 @Component({
   selector: 'app-movement-grid',
@@ -28,16 +29,27 @@ import { CategoryService } from 'src/app/services/category.service';
 })
 export class MovementGridComponent implements AfterViewInit, OnInit, OnDestroy {
   
+  /* Domain arrays */
   private _categories = new Map<string, Category>();
   private _bankAccounts = new Map<string, BankAccount>();
   private _creditCards = new Map<string, CreditCard>();
+
+  /* Represents the page size options available on the screen */
+  pageSizeOptions : number[] = [5, 10, 20];
+
 
   movementFilter : MovementFilter = new MovementFilter();
 
   NO_FILTER : string = '<not set>';
 
+  /* Enable or disable the movement table details */
   showDetails : boolean = false;
 
+  /* 
+   * Represents the visible columns on the screen. 
+   * A default column means the column will be visible even without the 
+   * showDetails attribute equals to true.
+   */
   columnDefinitions = [
     { name: 'select', default: true },
     { name: 'store', default: true },
@@ -49,14 +61,19 @@ export class MovementGridComponent implements AfterViewInit, OnInit, OnDestroy {
     { name: 'debit', default: false },
     { name: 'value', default: true }
   ];
-   
+     
+  /* Enable or disable the edit button on the screen. */
   isEditButtonDisabled: boolean = true;
 
+  /* Enable or disable the delete button on the screen. */
   isDeleteButtonDisabled: boolean = true;
 
+  /* Movement table datasource */
   dataSource: MovementDataSource;
 
-  selection = new SelectionModel<Movement>(true, []);
+  pagination : Pagination;
+
+  selection = new SelectionModel<string>(true, []);
 
   totalCost : number;
 
@@ -69,50 +86,23 @@ export class MovementGridComponent implements AfterViewInit, OnInit, OnDestroy {
                private _bankAccountService: BankAccountService,
                private _creditCardService: CreditCardService,
                private _movementService: MovementService,
-               private _snackBar: MatSnackBar ) { 
+               private _snackBar: MatSnackBar) { 
     
   }
 
   ngOnInit() {
-
     this.dataSource = new MovementDataSource( this._movementService );
-    this.dataSource.loadMovements(0, 5);
+    
+    this._subscribeMovementRefresh();    
+    this._subscribePaginationRefresh();
+    
+    this.dataSource.loadMovements(0, this.pageSizeOptions[0]);
+    
+    this._loadCategories();
+    this._loadBankAccounts();
+    this._loadCreditCards();
 
-    /*this._movementService.getEntities().pipe(untilDestroyed(this)).subscribe(data => {
-      this.dataSource.data = [];
-      this.dataSource.data = data;
-
-      this.totalCost = data.map(t => t).reduce((acc, movement) => movement.isDebit? acc - movement.value : acc + movement.value, 0);
-    });
-    this.dataSource.sort = this.sort;*/
-
-    this._categoryService.getEntities().pipe(untilDestroyed(this)).subscribe(categories => {
-      this._categories.clear();
-      categories.forEach( category => {
-        this._categories.set( category.id, category );
-      });
-    });
-
-    this._bankAccountService.getEntities().pipe(untilDestroyed(this)).subscribe(bankAccounts => {
-      this._bankAccounts.clear();
-      bankAccounts.forEach( bankAccount => {
-        this._bankAccounts.set( bankAccount.id, bankAccount );
-      });
-    });
-
-    this._creditCardService.getEntities().pipe(untilDestroyed(this)).subscribe(creditCards => {
-      this._creditCards.clear();
-      creditCards.forEach( creditCard => {
-        this._creditCards.set( creditCard.id, creditCard );
-      });
-    });
-
-    this.selection.changed.pipe(untilDestroyed(this)).subscribe(item => {
-      this.isEditButtonDisabled = this.selection.selected.length != 1;
-      this.isDeleteButtonDisabled = this.selection.selected.length == 0;
-    }); 
-
-    //this.dataSource.paginator = this.paginator;
+    this._subscribeSelectionChanges();
   }
 
   ngOnDestroy(): void {    
@@ -128,17 +118,67 @@ export class MovementGridComponent implements AfterViewInit, OnInit, OnDestroy {
           tap(() => this.loadMovementsPage())
       )
       .subscribe();   
+  }  
+
+  private _subscribeSelectionChanges(){
+    /* Subscribe selection changes */
+    this.selection.changed.pipe(untilDestroyed(this)).subscribe(item => {
+      console.log( this.selection.selected.length );
+      this.isEditButtonDisabled = this.selection.selected.length != 1;
+      this.isDeleteButtonDisabled = this.selection.selected.length == 0;
+    }); 
   }
 
-  loadMovementsPage(){    
-    this.dataSource.loadMovements( this.paginator.pageIndex, this.paginator.pageSize, this.sort.active, this.sort.direction );
-  }
+  private _subscribeMovementRefresh(){
+    /* Subscribe to movement loading */
+    this.dataSource.movementSubject.subscribe( movements => {      
 
-  addMovement() {
-    this.dialog.open(MovementDialogComponent, {
-      width: '700px',
-      data: {}
+      const selected : string[] = this.selection.selected;
+      this.selection.clear();      
+
+      /* Reset  the movements selected after the table reload */
+      if( selected ){
+        selected.filter( id => this.exist(id) ).forEach( id => this.selection.toggle(id) );
+      }
     });
+  }
+
+  private _subscribePaginationRefresh(){
+    /* Subscribe to pagination load */
+    this.dataSource.paginationSubject.subscribe( pagination => {
+      this.pagination = pagination;
+    });
+  }
+
+  private _loadCategories(){
+    /* Load categories */
+    this._categoryService.getEntities().pipe(untilDestroyed(this)).subscribe(categories => {
+      this._categories = new Map(
+        categories.map(c => [ c.id, c] )
+      );
+    });
+  }
+
+  private _loadBankAccounts(){
+    /* Load bank account */
+    this._bankAccountService.getEntities().pipe(untilDestroyed(this)).subscribe(bankAccounts => {
+      this._bankAccounts = new Map(
+        bankAccounts.map(c => [ c.id, c] )
+      );      
+    });
+  }
+
+  private _loadCreditCards(){
+    /* Load credit cards */
+    this._creditCardService.getEntities().pipe(untilDestroyed(this)).subscribe(creditCards => {
+      this._creditCards = new Map(
+        creditCards.map(c => [ c.id, c] )
+      );
+    });
+  }
+
+  loadMovementsPage(){
+    this.dataSource.loadMovements( this.paginator.pageIndex, this.paginator.pageSize, this.sort.active, this.sort.direction, this.movementFilter );
   }
 
   getCategoryDescription( categoryId: string ){
@@ -149,7 +189,7 @@ export class MovementGridComponent implements AfterViewInit, OnInit, OnDestroy {
   getBankAccountDescription( bankAccountId: string ){
     const bankAccount : BankAccount = this._bankAccounts.get( bankAccountId );
     return bankAccount == null ? "" : `${bankAccount.bankName} (${bankAccount.name})`;
-  }  
+  }
 
   getCreditCardDescription( creditCardId: string ){
     const creditCard : CreditCard = this._creditCards.get( creditCardId );
@@ -178,38 +218,69 @@ export class MovementGridComponent implements AfterViewInit, OnInit, OnDestroy {
   masterToggle() {
     this.isAllSelected() ?
         this.selection.clear() :
-        this.dataSource.data.forEach(row => this.selection.select(row));
+        this.dataSource.data.forEach(row => this.selection.select(row.id));
+  }
+
+  addMovement() {
+    this._showMovementDialog();
   }
 
   editMovement() {
-    this.dialog.open(MovementDialogComponent, {
-      width: '700px',
-      data: this.selection.selected[0]
-    });
+    /* Getting the selected movement */    
+    const selectedMovement : Movement = this._getSelectedMovements()[0];
+    this._showMovementDialog( selectedMovement );
+  }
+
+  private _showMovementDialog( data? : Movement ){
+    const params : MatDialogConfig = {
+      width: '700px'
+    };
+
+    if( data ){
+      params.data = data;
+    }
+
+    const dialogRef = this.dialog.open(MovementDialogComponent, params);
+
+    dialogRef.afterClosed().pipe(
+      untilDestroyed(this)
+    ).subscribe(result => {        
+      if (result) {
+        this.loadMovementsPage();
+      }
+    });    
   }
 
   deleteMovement() {
+    console.log( this.selection.selected.length );
     if( this.selection.selected.length == 1 ){
       
-      const movement: Movement = this.selection.selected.shift();
+      const movement: Movement = this._getSelectedMovements()[0];
 
       this._snackBar.open(`Delete movement ${movement.store} (${movement.value})?`, 'Yes', { duration: 5000 }).onAction().pipe(untilDestroyed(this)).subscribe(() => {
-        this._movementService.deleteEntity(movement);
-        this._snackBar.open(`Movement ${movement.store} (${movement.value}) has been deleted!`);
-        this.selection.clear();
+        this._movementService.deleteEntity(movement).subscribe( m => {
+          this._snackBar.open(`Movement ${movement.store} (${movement.value}) has been deleted!`);
+          this.loadMovementsPage();
+        });
       });
 
     }else{
 
-      const movements : Movement[] = this.selection.selected;
+      const movements : Movement[] = this._getSelectedMovements();
 
       this._snackBar.open(`Delete movements?`, 'Yes', { duration: 5000 }).onAction().pipe(untilDestroyed(this)).subscribe(() => {
-        this._movementService.deleteAll(movements);
-        this._snackBar.open(`Movements have been deleted!`);
-        this.selection.clear();
+        this._movementService.deleteAll(movements).subscribe(m => {
+          this._snackBar.open(`Movements have been deleted!`);
+          this.loadMovementsPage();
+        });
       });
-
     }
+  }
+
+  private _getSelectedMovements() : Movement[] {
+    /* Getting the selected movement */    
+    const selectedMovements : Movement[] = this.dataSource.data.filter( m => this.selection.selected.some( selectedId => selectedId === m.id ) );
+    return selectedMovements;
   }
 
   showFilter(){
@@ -224,7 +295,10 @@ export class MovementGridComponent implements AfterViewInit, OnInit, OnDestroy {
     });
 
     dialogRef.afterClosed().pipe(untilDestroyed(this)).subscribe( result => {
-      this.movementFilter = result;
+      if( result ){
+        this.movementFilter = result;
+        this.loadMovementsPage();
+      }
     });
   }
 
@@ -252,8 +326,7 @@ export class MovementGridComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     if( this.movementFilter.purchaseYear ){
-      const purchaseYear : number = this.movementFilter.purchaseYear;
-      description.push(`Purchase Year = ${purchaseYear}`);
+      description.push(`Purchase Year = ${this.movementFilter.purchaseYear}`);
     }
 
     if( this.movementFilter.paymentInitialDate ){
@@ -272,28 +345,31 @@ export class MovementGridComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     if( this.movementFilter.paymentYear ){
-      const paymentYear : number = this.movementFilter.paymentYear;
-      description.push(`Payment Year = ${paymentYear}`);
+      description.push(`Payment Year = ${this.movementFilter.paymentYear}`);
     }
 
     if( this.movementFilter.store ){
-      const store : string = this.movementFilter.store;
-      description.push(`Store LIKE ${store}`);
+      description.push(`Store LIKE ${this.movementFilter.store}`);
+    }
+
+    if( this.movementFilter.initialValue ){      
+      description.push(`value >= ${this.movementFilter.initialValue}`);
+    }
+
+    if( this.movementFilter.finalValue ){      
+      description.push(`value <= ${this.movementFilter.finalValue}`);
     }
 
     if( this.movementFilter.categories ){
-      const categories : Category[] = this.movementFilter.categories;      
-      description.push(`Category IN (${categories.map(c => c.title).join(', ')})`);
+      description.push(`Category IN (${this.movementFilter.categories.map(c => c.title).join(', ')})`);
     }
 
     if( this.movementFilter.bankAccounts ){
-      const bankAccounts : BankAccount[] = this.movementFilter.bankAccounts;      
-      description.push(`Bank Account IN (${bankAccounts.map(b => b.name).join(', ')})`);
+      description.push(`Bank Account IN (${this.movementFilter.bankAccounts.map(b => b.name).join(', ')})`);
     }
 
     if( this.movementFilter.creditCards ){
-      const creditCards : BankAccount[] = this.movementFilter.creditCards;      
-      description.push(`Credit Card IN (${creditCards.map(c => c.name).join(', ')})`);
+      description.push(`Credit Card IN (${this.movementFilter.creditCards.map(c => c.name).join(', ')})`);
     }    
 
     if( !description || description.length == 0){
@@ -301,5 +377,33 @@ export class MovementGridComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     return description.join(' AND ');
+  }
+
+  get creditCards() : CreditCard[] {
+    return Array.from( this._creditCards ).map( c => c[1]);
+  }
+
+  get bankAccounts() : BankAccount[] {
+    return Array.from( this._bankAccounts ).map( c => c[1]);
+  }
+
+  get categories() : Category[] {
+    return Array.from( this._categories ).map( c => c[1]);
+  }
+
+  protected _getCreditCard(creditCardId: string): CreditCard {
+    return this._creditCards.get( creditCardId );
+  }
+
+  protected _getBankAccount(bankAccountId: string): BankAccount {
+    return this._bankAccounts.get( bankAccountId );      
+  }
+
+  protected _getCategory(categoryId: string): Category {
+      return this._categories.get(categoryId);
+  }
+
+  private exist( movementId : string ) : boolean {
+    return this.dataSource.data.some( m => m.id === movementId );
   }
 }

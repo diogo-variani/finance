@@ -1,8 +1,9 @@
 package com.finance.service;
 
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
-
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -13,14 +14,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.hateoas.Link;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -29,7 +31,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.finance.domain.Movement;
 import com.finance.exception.EntityNotFoundException;
 import com.finance.repository.MovementRepository;
+import com.finance.util.MovementFilterBuilder;
 import com.finance.util.PageResponseBuilder;
+import com.querydsl.core.types.Predicate;
 
 @CrossOrigin()
 @RestController()
@@ -47,49 +51,51 @@ public class MovementController extends PageableController {
 	public MovementController() {
 	}
 	
-	//@GetMapping(produces = "application/json", params = { "page", "size", "sortBy", "sortDir" })
 	@GetMapping(produces = "application/json")
-    public ResponseEntity<Map<String, Object>> getAll( 	@RequestParam(name = "page", required = false) Integer page, 
-    													@RequestParam(name = "size", required = false) Integer size, 
+    public ResponseEntity<Map<String, Object>> filter( 	@RequestParam(name = "page", required = false, defaultValue = "0") Integer page, 
+    													@RequestParam(name = "size", required = false, defaultValue = "10") Integer size, 
     													@RequestParam(name = "sortBy", required = false) String sortBy, 
-    													@RequestParam(name = "sortDir", required = false) String sortDir ) {
+    													@RequestParam(name = "sortDir", required = false) String sortDir,
+    													@RequestParam(name = "store", required = false) String store,
+    													@RequestParam(name = "initialValue", required = false) BigDecimal initialValue,
+    													@RequestParam(name = "finalValue", required = false) BigDecimal finalValue,
+    													@RequestParam(name = "categoryIds", required = false) String[] categoryIds,
+    													@RequestParam(name = "bankAccountsIds", required = false) String[] bankAccountIds,
+    													@RequestParam(name = "creditCardIds", required = false) String[] creditCardIds,
+    													@DateTimeFormat(pattern = "yyyy-MM-dd") @RequestParam(name = "paymentInitialDate", required = false) Date paymentInitialDate,
+    													@DateTimeFormat(pattern = "yyyy-MM-dd") @RequestParam(name = "paymentFinalDate", required = false) Date paymentFinalDate,
+    													@DateTimeFormat(pattern = "yyyy-MM-dd") @RequestParam(name = "purchaseInitialDate", required = false) Date purchaseInitialDate,
+    													@DateTimeFormat(pattern = "yyyy-MM-dd") @RequestParam(name = "purchaseFinalDate", required = false) Date purchaseFinalDate) {
 
 		validateSortFields(sortBy, sortDir, Movement.class);
 		
 		/* Creating the page request based on the parameters provided */
 		PageRequest pageRequest = cretePageRequest( page, size, sortBy, sortDir );
 		
-		logger.info("Getting all movements. Page: {}, Size {}", pageRequest.getPageNumber(), pageRequest.getPageSize() );
+		Predicate predicate = MovementFilterBuilder.start()
+									.store(store)
+									.values(initialValue, finalValue)
+									.categoryIds(categoryIds)
+									.bankAccountIds(bankAccountIds)
+									.paymentDate(paymentInitialDate, paymentFinalDate)
+									.purchaseDate(purchaseInitialDate, purchaseFinalDate)
+									.build();
 		
-		/* Find all movements paginated */
-		Page<Movement> movementPage = movementRepository.findAll(pageRequest);
-		
+		Page<Movement> movementPage = null;
+		if( predicate == null ) {
+			movementPage = movementRepository.findAll(pageRequest);
+		}else {
+			movementPage = movementRepository.findAll(predicate, pageRequest);
+		}
 		
 		/* Creating the response with page information, data and links. */
 		PageResponseBuilder builder = PageResponseBuilder.from(movementPage);
-		
-		if( movementPage.hasNext() ) {
-			Link next = createLink( movementPage.nextPageable(), Link.REL_NEXT, sortBy, sortDir );
-			builder.link( next );
-		}
-		
-		if(movementPage.hasPrevious()) {
-			Link previous = createLink( movementPage.previousPageable(), Link.REL_PREVIOUS, sortBy, sortDir );
-			builder.link( previous );
-		}
 		
 		Map<String, Object> response = builder.build();
 		
 		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK );
     }
-	
-	private Link createLink(Pageable pageable, String rel, String sortBy, String sortDir) {
-		int pageNumber = pageable.getPageNumber();
-		int pageSize = pageable.getPageSize();
 		
-		return linkTo(methodOn(MovementController.class).getAll(pageNumber, pageSize, sortBy, sortDir)).withRel( rel );
-	}
-
 	@GetMapping(path = "/{id}", produces = "application/json")
     public ResponseEntity<Movement> getById(@PathVariable String id) throws EntityNotFoundException {
 		Optional<Movement> optional = movementRepository.findById(id);
@@ -107,4 +113,50 @@ public class MovementController extends PageableController {
 		movementRepository.save(movement);
 		return new ResponseEntity<Movement>( movement, HttpStatus.CREATED );
     }
+	
+	@PutMapping(path = "/{id}", consumes="application/json", produces = "application/json")
+    public ResponseEntity<Movement> update(@PathVariable String id, @RequestBody @Valid Movement movement) throws EntityNotFoundException {
+		
+		/*
+		 * Looking for the entity based on the id provided by URL.
+		 */
+		Optional<Movement> optional = movementRepository.findById(id);
+
+		if( optional.isPresent() ) {
+			movement.setId(id);
+			movementRepository.save(movement);
+			return new ResponseEntity<Movement>( movement, HttpStatus.OK );
+		}else {
+			throw new EntityNotFoundException(id);
+		}
+    }
+	
+	@DeleteMapping(path = "/{id}")
+	public ResponseEntity<Movement> delete(@PathVariable String id) throws EntityNotFoundException {
+		Optional<Movement> optional = movementRepository.findById(id);
+		
+		if( optional.isPresent() ) {
+			Movement movement = optional.get();
+						
+			/*
+			 * Then we delete the category from the database.
+			 */
+			movementRepository.delete(movement);
+			return new ResponseEntity<Movement>( HttpStatus.OK );
+		}else {
+			throw new EntityNotFoundException(id);
+		}
+    }
+	
+	@DeleteMapping(produces = "application/json")
+	public ResponseEntity<Movement> delete(@RequestParam(name = "ids") List<String> ids ) throws EntityNotFoundException {
+		Iterable<Movement> itrMovements = movementRepository.findAllById(ids);
+		
+		List<Movement> movements = new ArrayList<Movement>();
+		itrMovements.forEach(movements::add);
+		
+		movementRepository.deleteAll(movements);
+		
+		return new ResponseEntity<Movement>( HttpStatus.OK );
+    }	
 }
