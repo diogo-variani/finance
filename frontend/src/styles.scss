@@ -1,26 +1,29 @@
 /* You can add global styles to this file, and also import other style files */
-@import "~@angular/material/prebuilt-themes/indigo-pink.css";
 
-body{
-    margin: 0;
-    font-family: Roboto,"Helvetica Neue Light","Helvetica Neue",Helvetica,Arial,"Lucida Grande",sans-serif;
+
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
 }
 
 mat-divider.style-fix {
-    height: 36px;
-    margin-left: 8px;
-    margin-right: 8px;
+  height: 36px;
+  margin-left: 8px;
+  margin-right: 8px;
 }
 
-table{
-    width: 100%;
+table {
+  width: 100%;
 }
 
-.mat-tab-body-content{
-    padding: 15px 10px 10px 10px;
+.mat-tab-body-content {
+  padding: 15px 10px 10px 10px;
 }
 
 mat-dialog-container .mat-form-field-infix {
-    width: 100% !important;
-    }
-    
+  width: 100% !important;
+}
+
+.right-align{
+  text-align: right !important;
+}

@@ -23,9 +23,7 @@
       </mat-form-field>
 
       <mat-form-field gdArea="value">
-        <input matInput type="number" currency-mask class="right-align" placeholder="Value" required
-          formControlName="value">
-        <span matPrefix>$&nbsp;</span>
+        <input matInput currencyMask class="right-align" placeholder="Value" required formControlName="value">
         <mat-error *ngFor="let validation of validationMessages.value">
           <mat-error class="error-message"
             *ngIf="movementFormGroup.get('value').hasError(validation.type) && 

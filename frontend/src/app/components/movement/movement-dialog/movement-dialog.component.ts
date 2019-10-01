@@ -100,13 +100,12 @@ export class MovementDialogComponent extends MovementFormAbstract implements OnI
         const bankAccount : BankAccount = this.data ? this._getBankAccount( this.data.bankAccountId ) : null;
         this.movementFormGroup.controls.bankAccount.setValue( bankAccount );
 
-
         this.bankAccountFiltered = this.movementFormGroup.controls.bankAccount.valueChanges
         .pipe(
           startWith(''),
           map(value => typeof value === 'string' ? value : value.bankName),      
-          map(bankName => bankName ? this._filterBankAccount(bankName) : this.bankAccounts.slice())
-        );        
+          map(bankName => bankName ? this._filterBankAccount(bankName) : this.bankAccounts.slice()),          
+        );
     });
 
     this._creditCardService.getEntities().pipe(untilDestroyed(this)).subscribe(data => {

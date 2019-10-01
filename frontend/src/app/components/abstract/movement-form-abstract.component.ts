@@ -9,11 +9,11 @@ import { CategoryService } from 'src/app/services/category.service';
 
 export abstract class MovementFormAbstract implements OnInit {
 
-    protected categories: Category[];
+     categories: Category[];
 
-    protected bankAccounts: BankAccount[];
+     bankAccounts: BankAccount[];
 
-    protected creditCards: CreditCard[];
+     creditCards: CreditCard[];
 
     constructor(protected _categoryService: CategoryService,
         protected _bankAccountService: BankAccountService,

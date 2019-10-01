@@ -1,20 +1,8 @@
-.app-movement-form-container {
-
-}
-
 .app-movement-form-container > * {
   width: 100%;
-}
-
-.right-align {
-  text-align: right;
 }
 
 input.right-align::-webkit-outer-spin-button,
 input.right-align::-webkit-inner-spin-button {
   display: none;
-}
-
-input.right-align {
-  -moz-appearance: textfield;
 }

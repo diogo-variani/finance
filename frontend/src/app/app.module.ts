@@ -23,6 +23,7 @@ import { MovementGridComponent } from './components/movement/movement-grid/movem
 import { MovementDialogComponent } from './components/movement/movement-dialog/movement-dialog.component';
 import { MovementFilterComponent } from './components/movement/movement-filter/movement-filter.component';
 
+import { NgxCurrencyModule } from "ngx-currency";
 
 import { HttpClientModule } from '@angular/common/http';
 import { EditableComponent } from './components/shared/editable/editable.component';
@@ -58,7 +59,8 @@ import { EditableOnEnterDirective } from './components/shared/editable/editable-
     FormsModule,
     FlexLayoutModule,
     MaterialModule,
-    ReactiveFormsModule/*,
+    ReactiveFormsModule,
+    NgxCurrencyModule /*,
     environment.production ? [] : HttpClientInMemoryWebApiModule.forRoot(FinanceBackendService)*/
     
   ],

@@ -35,7 +35,7 @@ export abstract class DraggableTreeComponent<O, T extends FlatTreeNode> implemen
   /*
    * Represents the table data source.
    */
-  protected dataSource: MatTreeFlatDataSource<O, T>;
+  dataSource: MatTreeFlatDataSource<O, T>;
   
   /*
    * Represents the node that is beeing dragged.
