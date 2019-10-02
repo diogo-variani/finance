@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import javax.validation.Valid;
 
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -87,7 +88,7 @@ public class CategoryController {
 			/*
 			 * Since it is a valid category, then firstly we remove the parent references.
 			 */
-			List<Category> subCategories = categoryRepository.findByParentId( category.getId() );
+			List<Category> subCategories = categoryRepository.findByParentId( new ObjectId( category.getId() ) );
 			if( subCategories != null ) {
 				subCategories.forEach(c -> c.setParentId(null));
 				categoryRepository.saveAll(subCategories);

@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import javax.validation.Valid;
 
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -122,7 +123,7 @@ public class CategoryTreeController {
 		categoryRepository.save( category );
 
 		//Delete all sub categories to be inserted afterwards
-		categoryRepository.deleteByParentId(category.getId());
+		categoryRepository.deleteByParentId(new ObjectId(category.getId()));
 		
 		List<Category> subCategories = category.getSubCategories();
 		
@@ -162,7 +163,7 @@ public class CategoryTreeController {
 		
 		logger.debug("Deep loading of category {} ({})", title, id);
 		
-		List<Category> subCategories = categoryRepository.findByParentId(id);
+		List<Category> subCategories = categoryRepository.findByParentId(new ObjectId(id));
 		
 		if( subCategories.isEmpty() ) {
 			return;

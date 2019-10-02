@@ -9,7 +9,8 @@ function insertRoots( roots ){
 	print("Inserting root categories...");
 	
 	var bulk = db.categories.initializeOrderedBulkOp();
-	roots.forEach( root => {		
+	roots.forEach( root => {
+		print( tojson( root ) );
 		bulk.insert( root );
 	});
 	bulk.execute( );
@@ -26,6 +27,9 @@ function insertChildren( parent, children ){
 		var bulk = db.categories.initializeOrderedBulkOp();		
 		children.forEach( child => {
 			child.parentId = parent._id;
+
+			print( tojson( child ) );
+
 			bulk.insert( child ) 
 		});
 		bulk.execute( );
@@ -58,7 +62,8 @@ insertRoots(
 		{ title: "Pessoal", description: "Despesas pessoais." },
 		{ title: "Tarifas", description: "Centraliza gastos com despesas bancárias." },
 		{ title: "Impostos", description: "Gastos utilizados impostos." },
-		{ title: "Levantamento", description: "Saques/Levantamentos realizados das contas bancárias." }
+		{ title: "Levantamento", description: "Saques/Levantamentos realizados das contas bancárias." },
+		{ title: "Diversos", description: "Gastos diversos." }
 	]
 );
 
@@ -117,7 +122,7 @@ insertChildren(
 	{title: "Transporte"},
 	[		
 		{ title: "Combustível", description: "Centraliza despesas diversas com combustível." },
-		{ title: "Metro/Ônibus", description: "Centraliza despesas diversas com metro/ônibus." },
+		{ title: "Metro / Ônibus", description: "Centraliza despesas diversas com metro/ônibus." },
 		{ title: "Uber", description: "Centraliza despesas diversas com Uber." },
 		{ title: "Passe", description: "Centraliza despesas diversas com passe mensal de transporte público." }		
 	]
@@ -140,7 +145,8 @@ insertChildren(
 		{ title: "Escola", description: "Centraliza despesas diversas com escola." },
 		{ title: "Material Escolar", description: "Centraliza despesas diversas com material escolar." },
 		{ title: "Idiomas", description: "Centraliza despesas diversas com escolas de idiomas." },
-		{ title: "Alimentação Escolar", description: "Centraliza despesas diversas com alimentação efetuadas na escola." }
+		{ title: "Alimentação Escolar", description: "Centraliza despesas diversas com alimentação efetuadas na escola." },
+		{ title: "ATL", description: "Centraliza despesas de educação gastas com o ATL."}
 	]
 );
 
@@ -183,6 +189,14 @@ insertChildren(
 	{title: "Levantamento"},
 	[		
 		{ title: "Bolso", description: "Centraliza levantamentos/saques realizados." }		
+	]
+);
+
+insertChildren(
+	{title: "Diversos"},
+	[		
+		{ title: "Correio", description: "Centraliza despesas com o envio de correspondências." },
+		{ title: "Material de Escritório", description: "Centraliza despesas com materiais de escritórios." }
 	]
 );
 
