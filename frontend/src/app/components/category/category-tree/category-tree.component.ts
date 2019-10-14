@@ -1,17 +1,17 @@
 //https://github.com/alerubis/angular-draggable-mat-tree
 import { Component, OnInit, OnDestroy } from '@angular/core';
 
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 
 import { Category } from 'src/app/models/category';
 import { CategoryDialogComponent } from '../category-dialog/category-dialog.component';
-import { MatSnackBar } from '@angular/material';
 import { untilDestroyed } from 'ngx-take-until-destroy';
 import { CategoryTreeService } from 'src/app/services/category-tree.service';
 import { FlatTreeNode } from '../../abstract/tree/draggable-tree/draggable-tree.component';
 import { SelectableTreeComponent } from '../../abstract/tree/selectable-tree/selectable-tree.component';
 import { CategoryService } from 'src/app/services/category.service';
 import { delay } from 'rxjs/operators';
+import { NotificationService } from 'src/app/services/notification.service';
 
 /*
  * Category flat tree node to be used in the tree.
@@ -56,7 +56,7 @@ export class CategoryTreeComponent extends SelectableTreeComponent<Category, Cat
   constructor(private _categoryTreeService: CategoryTreeService,
     private _categoryService: CategoryService,    
     public dialog: MatDialog,
-    private _snackBar: MatSnackBar) {    
+    private _notificationService: NotificationService) {    
       super();
   }
 
@@ -91,10 +91,16 @@ export class CategoryTreeComponent extends SelectableTreeComponent<Category, Cat
    * @param - the data that eventually will be edited. Null if it is a new category.
    */
   private _openDialog( data? : Category ) {
-    const dialogRef = this.dialog.open(CategoryDialogComponent, {
+
+    const opts : MatDialogConfig = {
       width: this.DEFAULT_CATEGORY_DIALOG_WIDTH,
-      data: data
-    });
+    }; 
+
+    if( data ){
+      opts.data = data;
+    }    
+
+    const dialogRef = this.dialog.open(CategoryDialogComponent, opts );
     
     dialogRef.afterClosed()
       .pipe(
@@ -112,7 +118,7 @@ export class CategoryTreeComponent extends SelectableTreeComponent<Category, Cat
   deleteCategoryNode() {
     const category: Category = this._getSelectedCategory();
 
-    this._snackBar.open(`Delete category node ${category.title}?`, 'Yes', { duration: 5000 }).onAction()
+    this._notificationService.showQuestion(`Delete category node ${category.title}?`, 'Yes')
       .pipe(
         untilDestroyed(this)
       )
@@ -125,7 +131,7 @@ export class CategoryTreeComponent extends SelectableTreeComponent<Category, Cat
           /* Clear the selected node deleted */
           this.selection.clear();
 
-          this._snackBar.open(`Category node ${category.title} has been deleted!`);
+          this._notificationService.showSuccess(`Category node ${category.title} has been deleted!`);
           this._loadTree();
         });
 
@@ -139,7 +145,7 @@ export class CategoryTreeComponent extends SelectableTreeComponent<Category, Cat
   deleteCategoryTree() {
     const category: Category = this._getSelectedCategory();
 
-    this._snackBar.open(`Delete category tree ${category.title}?`, 'Yes', { duration: 5000 }).onAction()
+    this._notificationService.showQuestion(`Delete category tree ${category.title}?`, 'Yes')
       .pipe(
         untilDestroyed(this)
       )
@@ -152,10 +158,9 @@ export class CategoryTreeComponent extends SelectableTreeComponent<Category, Cat
           /* Clear the selected node deleted */
           this.selection.clear();
           
-          this._snackBar.open(`Category tree ${category.title} has been deleted!`);
+          this._notificationService.showSuccess(`Category tree ${category.title} has been deleted!`);
           this._loadTree();
         });
-
       }
     );
   }

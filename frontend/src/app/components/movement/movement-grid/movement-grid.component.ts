@@ -1,6 +1,6 @@
 //https://blog.angular-university.io/angular-material-data-table/
 import { Component, OnInit, ViewChild, AfterViewInit, OnDestroy } from '@angular/core';
-import { MatDialog, MatSort, MatSnackBar, MatDialogConfig } from '@angular/material';
+import { MatDialog, MatSort, MatDialogConfig } from '@angular/material';
 import {MatPaginator} from '@angular/material/paginator';
 
 import { MovementDialogComponent } from '../movement-dialog/movement-dialog.component';
@@ -16,11 +16,12 @@ import { MovementFilterComponent } from '../movement-filter/movement-filter.comp
 import * as moment from 'moment';
 import { MovementFilter, MONTHS } from 'src/app/models/movement-filter';
 import { untilDestroyed } from 'ngx-take-until-destroy';
-import { MovementDataSource } from 'src/app/datasource/movement/movement.datasource';
 import { tap } from 'rxjs/operators';
 import { merge } from 'rxjs/internal/observable/merge';
 import { CategoryService } from 'src/app/services/category.service';
 import { Pagination } from 'src/app/models/pagination/pagination';
+import { MovementDataSource } from 'src/app/datasources/movement.datasource';
+import { NotificationService } from 'src/app/services/notification.service';
 
 @Component({
   selector: 'app-movement-grid',
@@ -86,7 +87,7 @@ export class MovementGridComponent implements AfterViewInit, OnInit, OnDestroy {
                private _bankAccountService: BankAccountService,
                private _creditCardService: CreditCardService,
                private _movementService: MovementService,
-               private _snackBar: MatSnackBar) { 
+               private _notificationService: NotificationService) { 
     
   }
 
@@ -257,9 +258,9 @@ export class MovementGridComponent implements AfterViewInit, OnInit, OnDestroy {
       
       const movement: Movement = this._getSelectedMovements()[0];
 
-      this._snackBar.open(`Delete movement ${movement.store} (${movement.value})?`, 'Yes', { duration: 5000 }).onAction().pipe(untilDestroyed(this)).subscribe(() => {
+      this._notificationService.showQuestion(`Delete movement ${movement.store} (${movement.value})?`, 'Yes').pipe(untilDestroyed(this)).subscribe(() => {
         this._movementService.deleteEntity(movement).subscribe( m => {
-          this._snackBar.open(`Movement ${movement.store} (${movement.value}) has been deleted!`);
+          this._notificationService.showSuccess(`Movement ${movement.store} (${movement.value}) has been deleted!`);
           this.loadMovementsPage();
         });
       });
@@ -268,9 +269,9 @@ export class MovementGridComponent implements AfterViewInit, OnInit, OnDestroy {
 
       const movements : Movement[] = this._getSelectedMovements();
 
-      this._snackBar.open(`Delete movements?`, 'Yes', { duration: 5000 }).onAction().pipe(untilDestroyed(this)).subscribe(() => {
+      this._notificationService.showQuestion(`Delete movements?`, 'Yes').pipe(untilDestroyed(this)).subscribe(() => {
         this._movementService.deleteAll(movements).subscribe(m => {
-          this._snackBar.open(`Movements have been deleted!`);
+          this._notificationService.showSuccess(`Movements have been deleted!`);
           this.loadMovementsPage();
         });
       });

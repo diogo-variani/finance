@@ -3,7 +3,7 @@ import { AppComponent } from './app.component';
 
 import { MaterialModule } from './shared/material.module';
 
-import { NgModule } from '@angular/core';
+import { NgModule, ErrorHandler } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { BrowserModule } from '@angular/platform-browser';
@@ -25,11 +25,13 @@ import { MovementFilterComponent } from './components/movement/movement-filter/m
 
 import { NgxCurrencyModule } from "ngx-currency";
 
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { EditableComponent } from './components/shared/editable/editable.component';
 import { ViewModeDirective } from './components/shared/editable/view-mode.directive';
 import { EditModeDirective } from './components/shared/editable/edit-mode.directive';
 import { EditableOnEnterDirective } from './components/shared/editable/editable-on-enter.directive';
+import { GlobalErrorHandler } from './error-handlers/global-error-handler';
+import { ServerErrorInterceptor } from './error-handlers/server-error.interceptor';
 
 @NgModule({
   declarations: [
@@ -72,7 +74,9 @@ import { EditableOnEnterDirective } from './components/shared/editable/editable-
     MovementFilterComponent
   ],
   providers: [
-    {provide: MAT_SNACK_BAR_DEFAULT_OPTIONS, useValue: {duration: 2000, horizontalPosition: 'center'}}
+    {provide: MAT_SNACK_BAR_DEFAULT_OPTIONS, useValue: {duration: 2000, horizontalPosition: 'center'}},
+    { provide: ErrorHandler, useClass: GlobalErrorHandler },
+    { provide: HTTP_INTERCEPTORS, useClass: ServerErrorInterceptor, multi: true }
   ],
   bootstrap: [AppComponent]
 })

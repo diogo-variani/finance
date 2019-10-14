@@ -3,8 +3,8 @@
   <mat-dialog-content>
 
     <div class="app-bank-account-edit-container">
-      <h1 mat-dialog-title *ngIf="!data.id">New Bank Account</h1>
-      <h1 mat-dialog-title *ngIf="data.id">Edit Bank Account</h1>
+      <h1 mat-dialog-title *ngIf="!data">New Bank Account</h1>
+      <h1 mat-dialog-title *ngIf="data">Edit Bank Account</h1>
 
       <mat-form-field>
         <input matInput placeholder="Name" required formControlName="name">

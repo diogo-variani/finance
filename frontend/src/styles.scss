@@ -27,3 +27,12 @@ mat-dialog-container .mat-form-field-infix {
 .right-align{
   text-align: right !important;
 }
+
+.error-message {
+  background-color: firebrick;
+  color: white;    
+}
+
+.error-message button {
+  color: white;
+}

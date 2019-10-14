@@ -7,13 +7,14 @@ import { Observable } from 'rxjs';
 import { startWith, map } from 'rxjs/operators';
 import { CreditCard } from 'src/app/models/credit-card';
 import { CreditCardService } from 'src/app/services/credit-card.service';
-import { MatDialogRef, MAT_DIALOG_DATA, MatSnackBar } from '@angular/material';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { MovementService } from 'src/app/services/movement.service';
 import { Movement } from 'src/app/models/movement';
 import { untilDestroyed } from 'ngx-take-until-destroy';
 import { CategoryService } from 'src/app/services/category.service';
 import { MovementFormAbstract } from '../../abstract/movement-form-abstract.component';
 import { MovementFilter } from 'src/app/models/movement-filter';
+import { NotificationService } from 'src/app/services/notification.service';
 
 @Component({
   selector: 'app-movement-dialog',
@@ -57,7 +58,7 @@ export class MovementDialogComponent extends MovementFormAbstract implements OnI
     @Inject(MAT_DIALOG_DATA) public data: Movement,
     private _formBuilder: FormBuilder,
     public dialogRef: MatDialogRef<MovementDialogComponent>,
-    private _snackBar: MatSnackBar) {
+    private _noficationService: NotificationService) {
 
     super(_categoryService, _bankAccountService, _creditCardService);
 
@@ -179,7 +180,7 @@ export class MovementDialogComponent extends MovementFormAbstract implements OnI
 
   saveMovement(){
     this._saveCurrentMovement().subscribe( movement => {
-      this._snackBar.open(`Movement ${movement.store} (${movement.value}) has been ${this.data ? 'edited' : 'created'} successfully!`);
+      this._noficationService.showSuccess(`Movement ${movement.store} (${movement.value}) has been ${this.data ? 'edited' : 'created'} successfully!`);
       this.dialogRef.close(movement);
     });
   }

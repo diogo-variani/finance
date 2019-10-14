@@ -1,12 +1,13 @@
-import { Component, Inject, OnInit, OnDestroy, ContentChild, ViewChild } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA, MatSnackBar, MatTable, MatTab } from '@angular/material';
+import { Component, Inject, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { MatDialogRef, MAT_DIALOG_DATA, MatTable} from '@angular/material';
 import { Category } from 'src/app/models/category';
 
 import { Observable } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
-import { FormBuilder, Validators, FormGroup, FormControl, FormArray, AbstractControl, ControlContainer } from '@angular/forms';
+import { FormBuilder, Validators, FormGroup, FormArray, AbstractControl } from '@angular/forms';
 import { untilDestroyed } from 'ngx-take-until-destroy';
 import { CategoryTreeService } from 'src/app/services/category-tree.service';
+import { NotificationService } from 'src/app/services/notification.service';
 
 @Component({
   selector: 'app-category-dialog',
@@ -40,7 +41,7 @@ export class CategoryDialogComponent implements OnInit, OnDestroy {
     @Inject(MAT_DIALOG_DATA) public data: Category,
     private _categoryTreeService: CategoryTreeService,
     private _formBuilder: FormBuilder,
-    private _snackBar: MatSnackBar) {
+    private _notificationService: NotificationService) {
             
       
   }
@@ -146,11 +147,11 @@ export class CategoryDialogComponent implements OnInit, OnDestroy {
     .pipe(untilDestroyed(this))
     .subscribe(newCategory => {
       this.dialogRef.close(category);
-      this._snackBar.open(`Category ${category.title} has been ${this.data.id ? 'edited' : 'created'} successfully!`);
+      this._notificationService.showSuccess(`Category ${category.title} has been ${this.data.id ? 'edited' : 'created'} successfully!`);
     });
   }
 
-  addSubCategory(){        
+  addSubCategory(){
     (<FormArray>this.categoryFormGroup.controls['subCategories']).push( 
       this._formBuilder.group({
         id: [null],

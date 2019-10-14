@@ -1,16 +1,17 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit, Inject, OnDestroy } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { MatDialogRef, MAT_DIALOG_DATA, MatSnackBar } from '@angular/material';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { CreditCardService } from 'src/app/services/credit-card.service';
 import { CreditCard } from 'src/app/models/credit-card';
 import { untilDestroyed } from 'ngx-take-until-destroy';
+import { NotificationService } from 'src/app/services/notification.service';
 
 @Component({
   selector: 'app-credit-card-dialog',
   templateUrl: './credit-card-dialog.component.html',
   styleUrls: ['./credit-card-dialog.component.scss']
 })
-export class CreditCardDialogComponent implements OnInit {
+export class CreditCardDialogComponent implements OnInit, OnDestroy {
 
   validationMessages = {
     'name': [
@@ -30,7 +31,7 @@ export class CreditCardDialogComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: CreditCard,
     private _creditCardService: CreditCardService,
     private _formBuilder: FormBuilder,
-    private _snackBar: MatSnackBar) {    
+    private _notificationService : NotificationService ) {
       
       this.creditCardFormGroup = this._formBuilder.group(
         {
@@ -43,7 +44,9 @@ export class CreditCardDialogComponent implements OnInit {
   }
 
   ngOnInit() {
+  }
 
+  ngOnDestroy(): void {
   }
 
   cancel(): void {
@@ -59,7 +62,7 @@ export class CreditCardDialogComponent implements OnInit {
     }
 
     this._creditCardService.saveEntity( creditCard ).pipe(untilDestroyed(this)).subscribe( newCreditCard => {
-      this._snackBar.open(`Credit Card ${newCreditCard.name} has been ${newCreditCard.id ? 'edited' : 'created'} successfully!`);
+      this._notificationService.showSuccess(`Credit Card ${newCreditCard.name} has been ${newCreditCard.id ? 'edited' : 'created'} successfully!`);
       this.dialogRef.close(newCreditCard);
     });
   }

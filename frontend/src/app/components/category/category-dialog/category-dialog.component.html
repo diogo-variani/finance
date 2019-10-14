@@ -1,8 +1,8 @@
 <!-- https://github.com/AngularTemplates/angular-forms-and-validations/blob/master/src/app/forms/forms.component.html -->
 <form [formGroup]="categoryFormGroup" autocomplete="off">
   <mat-dialog-content>
-    <h1 mat-dialog-title *ngIf="!data.id">New Category</h1>
-    <h1 mat-dialog-title *ngIf="data.id">Edit Category</h1>
+    <h1 mat-dialog-title *ngIf="!data">New Category</h1>
+    <h1 mat-dialog-title *ngIf="data">Edit Category</h1>
 
     <mat-tab-group  dynamicHeight>
       <mat-tab label="General">

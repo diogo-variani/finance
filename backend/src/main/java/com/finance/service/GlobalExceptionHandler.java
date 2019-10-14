@@ -55,7 +55,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	@ExceptionHandler(value= {Exception.class})
 	protected ResponseEntity<Object> handleInternalServerError(Exception ex, WebRequest request){
 		
-		logger.error(ex.getMessage());
+		logger.error(ex.getMessage(), ex);
 		
         return createDefaultErrorMessage("Internal Server Error", HttpStatus.INTERNAL_SERVER_ERROR);
     }
