@@ -1,0 +1,2 @@
+#Retrieve token
+curl -d "client_id=finance-manager" -d "client_secret=d179d455-45fe-497d-9345-619d0dbeb431" -d "username=variani" -d "password=variani" -d "grant_type=password" "http://localhost:8180/auth/realms/finance/protocol/openid-connect/token"

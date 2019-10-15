@@ -36,7 +36,7 @@ import com.finance.repository.BankAccountRepository;
 
 @CrossOrigin()
 @RestController()
-@RequestMapping(path = "/bankAccounts")
+@RequestMapping(path = "/api/bankAccounts")
 public class BankAccountController {
 
 	/**

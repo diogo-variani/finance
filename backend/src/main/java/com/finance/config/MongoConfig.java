@@ -1,4 +1,4 @@
-package com.finance;
+package com.finance.config;
 
 import static  java.util.Collections.singletonList;
 

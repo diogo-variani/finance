@@ -1,12 +1,12 @@
 {
   "id": "finance-realm",
-  "realm": "finance-realm",
+  "realm": "finance",
   "displayName": "Finance Manager",
   "displayNameHtml": "Finance Manager",
   "notBefore": 0,
   "revokeRefreshToken": false,
   "refreshTokenMaxReuse": 0,
-  "accessTokenLifespan": 300,
+  "accessTokenLifespan": 1800,
   "accessTokenLifespanForImplicitFlow": 900,
   "ssoSessionIdleTimeout": 1800,
   "ssoSessionMaxLifespan": 36000,
@@ -39,35 +39,6 @@
   "maxDeltaTimeSeconds": 43200,
   "failureFactor": 30,
   "roles": {
-    "realm": [
-      {
-        "id": "b4c4f97c-8a6a-4b35-b4be-d9bd4072a411",
-        "name": "read-only",
-        "description": "The user can just read the values and report.",
-        "composite": false,
-        "clientRole": false,
-        "containerId": "finance-realm",
-        "attributes": {}
-      },
-      {
-        "id": "58f982c2-266e-480e-810a-0c2329b08ffe",
-        "name": "admin",
-        "description": "Represents the system administrators.",
-        "composite": false,
-        "clientRole": false,
-        "containerId": "finance-realm",
-        "attributes": {}
-      },
-      {
-        "id": "3fdeb005-de92-45eb-bf2c-7236e3c71689",
-        "name": "user",
-        "description": "Represents a normal user. The user cannot access the configuration menu but can manage the finance entities.",
-        "composite": false,
-        "clientRole": false,
-        "containerId": "finance-realm",
-        "attributes": {}
-      }
-    ],
     "client": {
       "realm-management": [
         {
@@ -281,7 +252,40 @@
           "attributes": {}
         }
       ],
-      "finance-manager": [],
+      "finance-manager": [
+        {
+          "id": "e5279eb9-ef66-4690-8da3-fe66798fdf35",
+          "name": "read-only",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "135d42fe-5eda-45f9-9a6e-5cf603856da8",
+          "attributes": {}
+        },
+        {
+          "id": "59e3f6f5-aad5-48f7-84d7-adc25365c0f5",
+          "name": "uma_protection",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "135d42fe-5eda-45f9-9a6e-5cf603856da8",
+          "attributes": {}
+        },
+        {
+          "id": "a636d663-1ff3-4f69-a2a0-1a1dfff3b164",
+          "name": "user",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "135d42fe-5eda-45f9-9a6e-5cf603856da8",
+          "attributes": {}
+        },
+        {
+          "id": "7618c1d4-32a7-460a-8944-c9fe5996310d",
+          "name": "admin",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "135d42fe-5eda-45f9-9a6e-5cf603856da8",
+          "attributes": {}
+        }
+      ],
       "security-admin-console": [],
       "admin-cli": [],
       "broker": [
@@ -333,44 +337,7 @@
       ]
     }
   },
-  "groups": [
-    {
-      "id": "66c8cfdf-00d1-48e5-9fc0-d2d73c97675f",
-      "name": "admin-group",
-      "path": "/admin-group",
-      "attributes": {},
-      "realmRoles": [
-        "admin"
-      ],
-      "clientRoles": {},
-      "subGroups": []
-    },
-    {
-      "id": "0d9bf8f9-14c6-43f9-b152-0f1912aa76c3",
-      "name": "read-only-group",
-      "path": "/read-only-group",
-      "attributes": {},
-      "realmRoles": [
-        "read-only"
-      ],
-      "clientRoles": {},
-      "subGroups": []
-    },
-    {
-      "id": "ff8ca042-41b2-4674-b753-f18bcf405ccd",
-      "name": "user-group",
-      "path": "/user-group",
-      "attributes": {},
-      "realmRoles": [
-        "user"
-      ],
-      "clientRoles": {},
-      "subGroups": []
-    }
-  ],
-  "defaultRoles": [
-    "user"
-  ],
+  "groups": [],
   "requiredCredentials": [
     "password"
   ],
@@ -385,51 +352,6 @@
     "Google Authenticator"
   ],
   "clients": [
-    {
-      "id": "f1c6ea30-1685-4385-9073-299bf053792d",
-      "clientId": "account",
-      "name": "${client_account}",
-      "baseUrl": "/auth/realms/finance-realm/account",
-      "surrogateAuthRequired": false,
-      "enabled": true,
-      "clientAuthenticatorType": "client-secret",
-      "secret": "**********",
-      "defaultRoles": [
-        "view-profile",
-        "manage-account"
-      ],
-      "redirectUris": [
-        "/auth/realms/finance-realm/account/*"
-      ],
-      "webOrigins": [],
-      "notBefore": 0,
-      "bearerOnly": false,
-      "consentRequired": false,
-      "standardFlowEnabled": true,
-      "implicitFlowEnabled": false,
-      "directAccessGrantsEnabled": false,
-      "serviceAccountsEnabled": false,
-      "publicClient": false,
-      "frontchannelLogout": false,
-      "protocol": "openid-connect",
-      "attributes": {},
-      "authenticationFlowBindingOverrides": {},
-      "fullScopeAllowed": false,
-      "nodeReRegistrationTimeout": 0,
-      "defaultClientScopes": [
-        "web-origins",
-        "role_list",
-        "profile",
-        "roles",
-        "email"
-      ],
-      "optionalClientScopes": [
-        "address",
-        "phone",
-        "offline_access",
-        "microprofile-jwt"
-      ]
-    },
     {
       "id": "c4029478-85d2-4bef-8e3f-90278427a073",
       "clientId": "admin-cli",
@@ -507,64 +429,6 @@
       ]
     },
     {
-      "id": "135d42fe-5eda-45f9-9a6e-5cf603856da8",
-      "clientId": "finance-manager",
-      "rootUrl": "http://localhost:4200/",
-      "adminUrl": "http://localhost:4200/",
-      "surrogateAuthRequired": false,
-      "enabled": true,
-      "clientAuthenticatorType": "client-secret",
-      "secret": "**********",
-      "redirectUris": [
-        "http://localhost:4200/*"
-      ],
-      "webOrigins": [
-        "http://localhost:4200"
-      ],
-      "notBefore": 0,
-      "bearerOnly": false,
-      "consentRequired": false,
-      "standardFlowEnabled": true,
-      "implicitFlowEnabled": false,
-      "directAccessGrantsEnabled": true,
-      "serviceAccountsEnabled": false,
-      "publicClient": true,
-      "frontchannelLogout": false,
-      "protocol": "openid-connect",
-      "attributes": {
-        "saml.assertion.signature": "false",
-        "saml.force.post.binding": "false",
-        "saml.multivalued.roles": "false",
-        "saml.encrypt": "false",
-        "login_theme": "keycloak",
-        "saml.server.signature": "false",
-        "saml.server.signature.keyinfo.ext": "false",
-        "exclude.session.state.from.auth.response": "false",
-        "saml_force_name_id_format": "false",
-        "saml.client.signature": "false",
-        "tls.client.certificate.bound.access.tokens": "false",
-        "saml.authnstatement": "false",
-        "display.on.consent.screen": "false",
-        "saml.onetimeuse.condition": "false"
-      },
-      "authenticationFlowBindingOverrides": {},
-      "fullScopeAllowed": true,
-      "nodeReRegistrationTimeout": -1,
-      "defaultClientScopes": [
-        "web-origins",
-        "role_list",
-        "profile",
-        "roles",
-        "email"
-      ],
-      "optionalClientScopes": [
-        "address",
-        "phone",
-        "offline_access",
-        "microprofile-jwt"
-      ]
-    },
-    {
       "id": "95086a45-bb46-4f29-84fb-2d031c13a235",
       "clientId": "realm-management",
       "name": "${client_realm-management}",
@@ -603,16 +467,164 @@
       ]
     },
     {
-      "id": "f8bcb683-b909-4205-8bd8-be28cb979e79",
-      "clientId": "security-admin-console",
-      "name": "${client_security-admin-console}",
-      "baseUrl": "/auth/admin/finance-realm/console/index.html",
+      "id": "f1c6ea30-1685-4385-9073-299bf053792d",
+      "clientId": "account",
+      "name": "${client_account}",
+      "baseUrl": "/auth/realms/finance/account",
+      "surrogateAuthRequired": false,
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "**********",
+      "defaultRoles": [
+        "view-profile",
+        "manage-account"
+      ],
+      "redirectUris": [
+        "/auth/realms/finance/account/*"
+      ],
+      "webOrigins": [],
+      "notBefore": 0,
+      "bearerOnly": false,
+      "consentRequired": false,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "publicClient": false,
+      "frontchannelLogout": false,
+      "protocol": "openid-connect",
+      "attributes": {},
+      "authenticationFlowBindingOverrides": {},
+      "fullScopeAllowed": false,
+      "nodeReRegistrationTimeout": 0,
+      "defaultClientScopes": [
+        "web-origins",
+        "role_list",
+        "profile",
+        "roles",
+        "email"
+      ],
+      "optionalClientScopes": [
+        "address",
+        "phone",
+        "offline_access",
+        "microprofile-jwt"
+      ]
+    },
+    {
+      "id": "135d42fe-5eda-45f9-9a6e-5cf603856da8",
+      "clientId": "finance-manager",
+      "rootUrl": "http://localhost:4200/",
+      "adminUrl": "http://localhost:4200/",
+      "baseUrl": "",
       "surrogateAuthRequired": false,
       "enabled": true,
       "clientAuthenticatorType": "client-secret",
       "secret": "**********",
       "redirectUris": [
-        "/auth/admin/finance-realm/console/*"
+        "http://localhost:4200/*"
+      ],
+      "webOrigins": [
+        "http://localhost:4200"
+      ],
+      "notBefore": 0,
+      "bearerOnly": false,
+      "consentRequired": false,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": true,
+      "publicClient": false,
+      "frontchannelLogout": false,
+      "protocol": "openid-connect",
+      "attributes": {
+        "saml.assertion.signature": "false",
+        "saml.force.post.binding": "false",
+        "saml.multivalued.roles": "false",
+        "saml.encrypt": "false",
+        "login_theme": "keycloak",
+        "saml.server.signature": "false",
+        "saml.server.signature.keyinfo.ext": "false",
+        "exclude.session.state.from.auth.response": "false",
+        "saml_force_name_id_format": "false",
+        "saml.client.signature": "false",
+        "tls.client.certificate.bound.access.tokens": "false",
+        "saml.authnstatement": "false",
+        "display.on.consent.screen": "false",
+        "saml.onetimeuse.condition": "false"
+      },
+      "authenticationFlowBindingOverrides": {},
+      "fullScopeAllowed": true,
+      "nodeReRegistrationTimeout": -1,
+      "protocolMappers": [
+        {
+          "id": "1f807e9e-0b6e-4bef-bb48-ab78d419e5f3",
+          "name": "Client IP Address",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usersessionmodel-note-mapper",
+          "consentRequired": false,
+          "config": {
+            "user.session.note": "clientAddress",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "clientAddress",
+            "jsonType.label": "String"
+          }
+        },
+        {
+          "id": "0d7477dc-a285-4880-a6e9-5cce212fa733",
+          "name": "Client Host",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usersessionmodel-note-mapper",
+          "consentRequired": false,
+          "config": {
+            "user.session.note": "clientHost",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "clientHost",
+            "jsonType.label": "String"
+          }
+        },
+        {
+          "id": "01a1593c-706a-487f-a20e-1864350416eb",
+          "name": "Client ID",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usersessionmodel-note-mapper",
+          "consentRequired": false,
+          "config": {
+            "user.session.note": "clientId",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "clientId",
+            "jsonType.label": "String"
+          }
+        }
+      ],
+      "defaultClientScopes": [
+        "web-origins",
+        "role_list",
+        "profile",
+        "roles",
+        "email"
+      ],
+      "optionalClientScopes": [
+        "address",
+        "phone",
+        "offline_access",
+        "microprofile-jwt"
+      ]
+    },
+    {
+      "id": "f8bcb683-b909-4205-8bd8-be28cb979e79",
+      "clientId": "security-admin-console",
+      "name": "${client_security-admin-console}",
+      "baseUrl": "/auth/admin/finance/console/index.html",
+      "surrogateAuthRequired": false,
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "**********",
+      "redirectUris": [
+        "/auth/admin/finance/console/*"
       ],
       "webOrigins": [],
       "notBefore": 0,

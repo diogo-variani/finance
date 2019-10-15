@@ -26,7 +26,7 @@ import com.finance.repository.CategoryRepository;
 
 @CrossOrigin()
 @RestController()
-@RequestMapping(path = "/categories")
+@RequestMapping(path = "/api/categories")
 public class CategoryController {
 
 	@Autowired

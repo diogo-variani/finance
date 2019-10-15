@@ -29,7 +29,7 @@ import com.finance.repository.CategoryRepository;
 
 @CrossOrigin()
 @RestController()
-@RequestMapping(path = "/categories/tree")
+@RequestMapping(path = "/api/categories/tree")
 public class CategoryTreeController {
 
 	private final static Logger logger = LoggerFactory.getLogger(CategoryTreeController.class);

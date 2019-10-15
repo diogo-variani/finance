@@ -7,7 +7,6 @@ import java.util.Date;
 import com.finance.domain.QMovement;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
-import com.querydsl.core.types.dsl.BooleanExpression;
 
 public class MovementFilterBuilder {
 

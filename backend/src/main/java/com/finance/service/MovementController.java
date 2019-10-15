@@ -37,7 +37,7 @@ import com.querydsl.core.types.Predicate;
 
 @CrossOrigin()
 @RestController()
-@RequestMapping(path = "/movements")
+@RequestMapping(path = "/api/movements")
 public class MovementController extends PageableController {
 
 	private final static Logger logger = LoggerFactory.getLogger(MovementController.class);
