@@ -17,6 +17,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -108,12 +109,14 @@ public class MovementController extends PageableController {
 		}
     }
 	
+	@PreAuthorize("hasAnyRole('admin', 'user')")
 	@PostMapping(produces = "application/json", consumes = "application/json")
 	public ResponseEntity<Movement> insert(@Valid @RequestBody Movement movement) {
 		movementRepository.save(movement);
 		return new ResponseEntity<Movement>( movement, HttpStatus.CREATED );
     }
 	
+	@PreAuthorize("hasAnyRole('admin', 'user')")
 	@PutMapping(path = "/{id}", consumes="application/json", produces = "application/json")
     public ResponseEntity<Movement> update(@PathVariable String id, @RequestBody @Valid Movement movement) throws EntityNotFoundException {
 		
@@ -131,6 +134,7 @@ public class MovementController extends PageableController {
 		}
     }
 	
+	@PreAuthorize("hasAnyRole('admin', 'user')")
 	@DeleteMapping(path = "/{id}")
 	public ResponseEntity<Movement> delete(@PathVariable String id) throws EntityNotFoundException {
 		Optional<Movement> optional = movementRepository.findById(id);

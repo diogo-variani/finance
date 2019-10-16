@@ -33,14 +33,14 @@ import com.finance.repository.CreditCardRepository;
  * This REST service follows the RESTful definition.</p>
  * 
  * <p>It is possible to create, update, get all, get by id and delete a credit card entity.
- * The base URL is: <code>/creditCards</code></p>
+ * The base URL is: <code>/api/creditCards</code></p>
  * 
  * @author diogo.variani@gmail.com
  */
 @CrossOrigin()
 @RestController()
 @RequestMapping(path = "/api/creditCards")
-public class CreditCardController {
+public class CreditCardController{
 
 	private final static Logger logger = LoggerFactory.getLogger(CreditCardController.class);
 	
@@ -106,8 +106,8 @@ public class CreditCardController {
 	 * 
 	 * @throws MethodArgumentNotValidException if any required credit card data was not provided.
 	 */
+	@PreAuthorize("hasAnyRole('admin', 'user')")
 	@PutMapping(path = "/{id}", consumes="application/json", produces = "application/json")
-	@PreAuthorize("hasAnyAuthority('admin','read-only')")
     public ResponseEntity<CreditCard> update(@PathVariable String id, @RequestBody @Valid CreditCard creditCard) throws EntityNotFoundException {
 		
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -148,7 +148,7 @@ public class CreditCardController {
 	 * 
 	 * @throws MethodArgumentNotValidException if any required credit card data was not provided.
 	 */
-	@PreAuthorize("hasAnyAuthority('admin','read-only')")
+	@PreAuthorize("hasAnyRole('admin', 'user')")
 	@PostMapping(produces = "application/json", consumes = "application/json")
 	public ResponseEntity<CreditCard> insert(@Valid @RequestBody CreditCard creditCard) {
 		
@@ -168,8 +168,8 @@ public class CreditCardController {
 	 * 
 	 * @throws EntityNotFoundException if the id doesn't represent a valid credit card instance.
 	 */
+	@PreAuthorize("hasAnyRole('admin')")
 	@DeleteMapping(path = "/{id}")
-	@PreAuthorize("hasAnyAuthority('admin','read-only')")
 	public ResponseEntity<?> delete(@PathVariable String id) throws EntityNotFoundException {
 
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();

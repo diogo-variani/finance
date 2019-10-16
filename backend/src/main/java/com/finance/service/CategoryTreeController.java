@@ -13,6 +13,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -80,6 +81,7 @@ public class CategoryTreeController {
 		return new ResponseEntity<List<Category>>( roots, HttpStatus.OK );
     }
 	
+	@PreAuthorize("hasAnyRole('admin', 'user')")
 	@PostMapping(consumes = "application/json", produces = "application/json")
 	public ResponseEntity<Category> insert( @RequestBody @Valid Category category ){
 		logger.info("Inserting new category tree {}", category.toString());
@@ -88,6 +90,7 @@ public class CategoryTreeController {
 		return new ResponseEntity<Category>( category, HttpStatus.OK );
 	}
 	
+	@PreAuthorize("hasAnyRole('admin', 'user')")
 	@PutMapping(path = "/{id}", consumes = "application/json", produces = "application/json")
 	public ResponseEntity<Category> update( @PathVariable String id, @RequestBody @Valid Category category ){
 		logger.info("Updating category tree {}: {}", id, category.toString());
@@ -97,6 +100,7 @@ public class CategoryTreeController {
 		return new ResponseEntity<Category>( category, HttpStatus.OK );
 	}
 	
+	@PreAuthorize("hasAnyRole('admin')")
 	@DeleteMapping(path = "/{id}", produces = "application/json")
 	public ResponseEntity<?> delete( @PathVariable String id ) throws EntityNotFoundException{
 		logger.info("Deleting category tree {}", id);

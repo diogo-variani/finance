@@ -17,16 +17,13 @@ import org.springframework.security.web.authentication.session.NullAuthenticated
 import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 
 @KeycloakConfiguration
-@EnableWebSecurity
-@EnableGlobalMethodSecurity(securedEnabled = true)
+@EnableWebSecurity(/*debug = true*/)
+@EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true, proxyTargetClass = true)
 public class KeycloakConfig extends KeycloakWebSecurityConfigurerAdapter {
 
 	@Autowired
 	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-
 		SimpleAuthorityMapper mapper = new SimpleAuthorityMapper();
-		mapper.setPrefix("");
-		mapper.setConvertToLowerCase(true);
 		
 		KeycloakAuthenticationProvider keycloakAuthenticationProvider = keycloakAuthenticationProvider();
 		keycloakAuthenticationProvider.setGrantedAuthoritiesMapper(mapper);
@@ -50,7 +47,8 @@ public class KeycloakConfig extends KeycloakWebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity http) throws Exception {
 		super.configure(http);
 		http.sessionManagement().sessionCreationPolicy( SessionCreationPolicy.STATELESS ).and().		
-		authorizeRequests().antMatchers("/api/*").hasAnyAuthority("admin", "user", "read-only").anyRequest().fullyAuthenticated().and()
-		.anonymous().disable();
+			authorizeRequests().antMatchers("/api/*").hasAnyRole("admin", "user", "read-only").
+			anyRequest().fullyAuthenticated().and()
+			.anonymous().disable().csrf().disable();
 	}
 }

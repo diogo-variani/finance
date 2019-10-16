@@ -12,9 +12,8 @@ spring:
 
 logging:
    level:
-      #org.springframework.data.mongodb.core.MongoTemplate: DEBUG
-      org.springframework.security: DEBUG
-      #org.springframework: DEBUG
+      org.springframework.data.mongodb.core.MongoTemplate: INFO
+      org.springframework.security: INFO
       com.finance: DEBUG
 
 keycloak:

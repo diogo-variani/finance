@@ -3,12 +3,12 @@ package com.finance.service;
 import java.util.Optional;
 
 import javax.validation.Valid;
-import javax.validation.ValidationException;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -90,6 +90,7 @@ public class BankAccountController {
 	 * 
 	 * @throws MethodArgumentNotValidException if any required bank account data was not provided.
 	 */	
+	@PreAuthorize("hasAnyRole('admin', 'user')")
 	@PostMapping(produces = "application/json", consumes = "application/json")
 	public ResponseEntity<BankAccount> insert(@Valid @RequestBody BankAccount bankAccount) {
 		BankAccount savedBankAccount = bankAccountRepository.save(bankAccount);
@@ -110,6 +111,7 @@ public class BankAccountController {
 	 * 
 	 * @throws MethodArgumentNotValidException if any required bank account data was not provided.
 	 */
+	@PreAuthorize("hasAnyRole('admin', 'user')")
 	@PutMapping(path = "/{id}", consumes="application/json", produces = "application/json")
     public ResponseEntity<BankAccount> update(@PathVariable String id, @RequestBody @Valid BankAccount bankAccount) throws EntityNotFoundException {
 		
@@ -146,6 +148,7 @@ public class BankAccountController {
 	 * 
 	 * @throws EntityNotFoundException if the id doesn't represent a valid bank account instance.
 	 */	
+	@PreAuthorize("hasAnyRole('admin')")
 	@DeleteMapping(path = "/{id}")
 	public ResponseEntity<BankAccount> delete(@PathVariable String id) throws EntityNotFoundException {
 		

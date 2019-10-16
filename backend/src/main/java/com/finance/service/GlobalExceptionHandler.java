@@ -14,6 +14,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -47,9 +49,19 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return createDefaultErrorMessage(ex, HttpStatus.BAD_REQUEST);
     }
 	
+	@ExceptionHandler(value= {AccessDeniedException.class})
+	protected ResponseEntity<Object> handleValidationException(AccessDeniedException ex, WebRequest request){
+        return createDefaultErrorMessage(ex, HttpStatus.FORBIDDEN);
+    }
+	
 	@ExceptionHandler(value= {EntityNotFoundException.class})
-	protected ResponseEntity<Object> handleNotFoundException(Exception ex, WebRequest request){
+	protected ResponseEntity<Object> handleNotFoundException(EntityNotFoundException ex, WebRequest request){
         return createDefaultErrorMessage(ex, HttpStatus.NOT_FOUND);
+    }
+	
+	@ExceptionHandler(value= {AuthenticationCredentialsNotFoundException.class})
+	protected ResponseEntity<Object> handleNotFoundException(AuthenticationCredentialsNotFoundException ex, WebRequest request){
+        return createDefaultErrorMessage(ex, HttpStatus.UNAUTHORIZED);
     }
 
 	@ExceptionHandler(value= {Exception.class})

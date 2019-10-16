@@ -10,6 +10,7 @@ import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -54,6 +55,7 @@ public class CategoryController {
 		}
     }
 	
+	@PreAuthorize("hasAnyRole('admin', 'user')")
 	@PostMapping(produces = "application/json", consumes = "application/json")
 	public ResponseEntity<Category> insert(@Valid @RequestBody Category category) {
 		categoryRepository.save(category);
@@ -61,6 +63,7 @@ public class CategoryController {
 		return new ResponseEntity<Category>( category, HttpStatus.CREATED );
     }
 	
+	@PreAuthorize("hasAnyRole('admin', 'user')")
 	@PutMapping(path = "/{id}", consumes="application/json", produces = "application/json")
     public ResponseEntity<Category> update(@PathVariable String id, @RequestBody @Valid Category category) throws EntityNotFoundException {
 		
@@ -78,6 +81,7 @@ public class CategoryController {
 		}
     }
 	
+	@PreAuthorize("hasAnyRole('admin')")
 	@DeleteMapping(path = "/{id}")
 	public ResponseEntity<?> delete(@PathVariable String id) throws EntityNotFoundException {
 		Optional<Category> optional = categoryRepository.findById(id);
