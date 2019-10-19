@@ -1,28 +1,21 @@
-package com.finance.service;
+package com.finance.service.impl;
 
 import java.util.Optional;
 
-import javax.validation.Valid;
-
-import org.springframework.beans.BeanUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.finance.domain.BankAccount;
 import com.finance.exception.EntityNotFoundException;
 import com.finance.repository.BankAccountRepository;
+import com.finance.service.IEntityService;
 
 /**
  * <p>Controller that exposes all bank account features to be accessible through REST protocol.
@@ -37,26 +30,34 @@ import com.finance.repository.BankAccountRepository;
 @CrossOrigin()
 @RestController()
 @RequestMapping(path = "/api/bankAccounts")
-public class BankAccountController {
+public class BankAccountController implements IEntityService<BankAccount>{
 
+	/**
+	 * Default logger instance.
+	 */
+	private final static Logger logger = LoggerFactory.getLogger(BankAccountController.class);
+	
 	/**
 	 * Represents the bank account repository of data.
 	 */
 	@Autowired
 	private BankAccountRepository bankAccountRepository;
-	
+
 	/**
 	 * Retrieves all bank accounts.
 	 * 
-	 * @return a ResponseEntity<Iterable<BankAccount>> which contains all bank accounts. 
-	 * The list can be empty if no bank account was found.
+	 * @return 	an Iterable<BankAccount> which contains all bank accounts. 
+	 * 			The list can be empty if no bank account was found.
 	 */	
-	@GetMapping(produces = "application/json")
-    public ResponseEntity<Iterable<BankAccount>> getAll() {
+	@Override
+	public Iterable<BankAccount> getAll() {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		logger.debug("{}: Retrieving all bank accounts...", auth.getName());
+		
 		Iterable<BankAccount> bankAccounts = bankAccountRepository.findAll();
-		return new ResponseEntity<>(bankAccounts, HttpStatus.OK );
-    }
-	
+		return bankAccounts;	
+	}
+
 	/**
 	 * It looks for an specific bank account instance based on its ID which is 
 	 * provided by URL.
@@ -68,19 +69,52 @@ public class BankAccountController {
 	 * 
 	 * @throws EntityNotFoundException if the id doesn't represent a bank account instance.
 	 */	
-	@GetMapping(path = "/{id}", produces = "application/json")
-    public ResponseEntity<BankAccount> getById(@PathVariable String id) throws EntityNotFoundException {
+	@Override
+	public BankAccount getById(String id) throws EntityNotFoundException {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		logger.debug("{}: Getting bank account by id {}...", auth.getName(), id);
 		
 		Optional<BankAccount> optional = bankAccountRepository.findById(id);
 		
 		if( optional.isPresent() ) {
 			BankAccount bankAccount = optional.get();
-			return new ResponseEntity<BankAccount>( bankAccount, HttpStatus.OK );
+			return bankAccount;
 		}else {
 			throw new EntityNotFoundException(id);
 		}
-    }
-	
+	}
+
+	/**
+	 * This method updates an existing bank account instance which is represented by its id.
+	 * This id is specified by URL.
+	 * 
+	 * @param id the bank account instance id that will be updated.
+	 * @param bankAccount the bank account properties to be updated.
+	 * 
+	 * @return the new bank account after the updates.
+	 * 
+	 * @throws EntityNotFoundException if the id doesn't represent a valid bank account instance.
+	 * @throws MethodArgumentNotValidException if any required bank account data was not provided.
+	 */
+	@Override
+	public BankAccount update(String id, BankAccount entity) throws EntityNotFoundException {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		logger.debug("{}: Updating bank account id {}, values {}...", auth.getName(), id, entity);
+		
+		/*
+		 * Looking for the entity based on the id provided by URL.
+		 */
+		Optional<BankAccount> optional = bankAccountRepository.findById(id);
+
+		if( optional.isPresent() ) {
+			entity.setId(id);
+			bankAccountRepository.save(entity);
+			return entity;
+		}else {
+			throw new EntityNotFoundException(id);
+		}
+	}
+
 	/**
 	 * It creates a new bank account instance based on the message provided.
 	 * 
@@ -89,56 +123,15 @@ public class BankAccountController {
 	 * @return the new bank account instance created and its id.
 	 * 
 	 * @throws MethodArgumentNotValidException if any required bank account data was not provided.
-	 */	
-	@PreAuthorize("hasAnyRole('admin', 'user')")
-	@PostMapping(produces = "application/json", consumes = "application/json")
-	public ResponseEntity<BankAccount> insert(@Valid @RequestBody BankAccount bankAccount) {
-		BankAccount savedBankAccount = bankAccountRepository.save(bankAccount);
-		return new ResponseEntity<BankAccount>( savedBankAccount, HttpStatus.CREATED );
-    }
-	
-	/**
-	 * This method updates an existing bank account instance which is represented by its id.
-	 * This id is specified by URL.
-	 * 
-	 * @param id the bank account instance id that will be updated.
-	 * 
-	 * @param bankAccount the bank account properties to be updated.
-	 * 
-	 * @return the new bank account after the updates.
-	 * 
-	 * @throws EntityNotFoundException if the id doesn't represent a valid bank account instance.
-	 * 
-	 * @throws MethodArgumentNotValidException if any required bank account data was not provided.
-	 */
-	@PreAuthorize("hasAnyRole('admin', 'user')")
-	@PutMapping(path = "/{id}", consumes="application/json", produces = "application/json")
-    public ResponseEntity<BankAccount> update(@PathVariable String id, @RequestBody @Valid BankAccount bankAccount) throws EntityNotFoundException {
+	 */		
+	@Override
+	public BankAccount insert(BankAccount entity) {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		logger.debug("{}: Inserting a new bank account {}...", auth.getName(), entity);
 		
-		/*
-		 * Looking for the entity based on the id provided by URL.
-		 */
-		Optional<BankAccount> optional = bankAccountRepository.findById(id);
-
-		if( optional.isPresent() ) {
-			BankAccount storedBankAccount = optional.get();
-			BeanUtils.copyProperties(bankAccount, storedBankAccount);
-			
-			/*
-			 * Preserving the original object id...
-			 */
-			storedBankAccount.setId(id);
-			
-			/*
-			 * Updating the object specified...
-			 */
-			storedBankAccount = bankAccountRepository.save(storedBankAccount);
-			
-			return new ResponseEntity<BankAccount>( storedBankAccount, HttpStatus.OK );
-		}else {
-			throw new EntityNotFoundException(id);
-		}
-    }	
+		bankAccountRepository.save(entity);
+		return entity;
+	}
 
 	/**
 	 * This method deletes a existing bank account represented by its id 
@@ -148,18 +141,18 @@ public class BankAccountController {
 	 * 
 	 * @throws EntityNotFoundException if the id doesn't represent a valid bank account instance.
 	 */	
-	@PreAuthorize("hasAnyRole('admin')")
-	@DeleteMapping(path = "/{id}")
-	public ResponseEntity<BankAccount> delete(@PathVariable String id) throws EntityNotFoundException {
+	@Override
+	public void delete(String id) throws EntityNotFoundException {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		logger.debug("{}: Deleting a bank account id {}...", auth.getName(), id);		
 		
 		Optional<BankAccount> optional = bankAccountRepository.findById(id);
 		
 		if( optional.isPresent() ) {
 			BankAccount bankAccount = optional.get();
 			bankAccountRepository.delete(bankAccount);
-			return new ResponseEntity<BankAccount>( HttpStatus.OK );
 		}else {
 			throw new EntityNotFoundException(id);
 		}
-    }
+	}
 }

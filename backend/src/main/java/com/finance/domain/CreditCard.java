@@ -16,6 +16,15 @@ public class CreditCard extends BaseEntity {
 	@NotEmpty(message = "The number must be specified")
 	private String number;
 
+	public CreditCard(){}
+	
+	public CreditCard(String id, String name, String issuer, String number){
+		super(id);
+		this.name = name;
+		this.issuer = issuer;
+		this.number = number;
+	}
+	
 	public String getName() {
 		return name;
 	}

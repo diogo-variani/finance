@@ -16,6 +16,15 @@ public class BankAccount extends BaseEntity {
 	@NotEmpty(message = "The IBAN must be specified")
 	private String iban;
 
+	public BankAccount() {}
+	
+	public BankAccount(String id, String name, String bankName, String iban) {
+		super(id);
+		this.name = name;
+		this.bankName = bankName;
+		this.iban = iban;
+	}
+	
 	public String getName() {
 		return name;
 	}

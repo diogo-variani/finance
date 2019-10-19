@@ -1,32 +1,21 @@
-package com.finance.service;
+package com.finance.service.impl;
 
 import java.util.Optional;
 
-import javax.validation.Valid;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.finance.domain.CreditCard;
 import com.finance.exception.EntityNotFoundException;
 import com.finance.repository.CreditCardRepository;
+import com.finance.service.IEntityService;
 
 /**
  * <p>Controller that exposes all credit card features to be accessible through REST protocol.
@@ -40,8 +29,11 @@ import com.finance.repository.CreditCardRepository;
 @CrossOrigin()
 @RestController()
 @RequestMapping(path = "/api/creditCards")
-public class CreditCardController{
+public class CreditCardController implements IEntityService<CreditCard>{
 
+	/**
+	 * Default logger instance.
+	 */
 	private final static Logger logger = LoggerFactory.getLogger(CreditCardController.class);
 	
 	/**
@@ -49,22 +41,22 @@ public class CreditCardController{
 	 */
 	@Autowired
 	private CreditCardRepository creditCardRepository;
-	
+
 	/**
 	 * Retrieves all credit cards.
 	 * 
-	 * @return a ResponseEntity<Iterable<CreditCard>> which contains all credit cards. 
+	 * @return an Iterable<CreditCard> which contains all credit cards. 
 	 * The list can be empty if no credit card was found.
 	 */
-	@GetMapping(produces = "application/json")
-    public ResponseEntity<Iterable<CreditCard>> getAll() {
+	@Override
+	public Iterable<CreditCard> getAll() {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		logger.debug("{}: Retrieving all credit cards...", auth.getName());
 				
 		Iterable<CreditCard> creditCards = creditCardRepository.findAll();
-		return new ResponseEntity<Iterable<CreditCard>>(creditCards, HttpStatus.OK );
-    }
-	
+		return creditCards;
+	}
+
 	/**
 	 * It looks for an specific credit card instance based on its ID which is 
 	 * provided by URL.
@@ -75,10 +67,9 @@ public class CreditCardController{
 	 * was found, then an {@link EntityNotFoundException} is thrown.
 	 * 
 	 * @throws EntityNotFoundException if the id doesn't represent a credit card instance.
-	 */
-	@GetMapping(path = "/{id}", produces = "application/json")
-    public ResponseEntity<CreditCard> getById(@PathVariable String id) throws EntityNotFoundException {
-		
+	 */	
+	@Override
+	public CreditCard getById(String id) throws EntityNotFoundException {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		logger.debug("{}: Getting credit card by id {}...", auth.getName(), id);
 		
@@ -86,11 +77,11 @@ public class CreditCardController{
 		
 		if( optional.isPresent() ) {
 			CreditCard creditCard = optional.get();
-			return new ResponseEntity<CreditCard>( creditCard, HttpStatus.OK );
+			return creditCard;
 		}else {
 			throw new EntityNotFoundException(id);
 		}
-    }
+	}
 
 	/**
 	 * This method updates an existing credit card instance which is represented by its id.
@@ -106,12 +97,10 @@ public class CreditCardController{
 	 * 
 	 * @throws MethodArgumentNotValidException if any required credit card data was not provided.
 	 */
-	@PreAuthorize("hasAnyRole('admin', 'user')")
-	@PutMapping(path = "/{id}", consumes="application/json", produces = "application/json")
-    public ResponseEntity<CreditCard> update(@PathVariable String id, @RequestBody @Valid CreditCard creditCard) throws EntityNotFoundException {
-		
+	@Override
+	public CreditCard update(String id, CreditCard entity) throws EntityNotFoundException {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		logger.debug("{}: Updating credit card id {}, values {}...", auth.getName(), id, creditCard);
+		logger.debug("{}: Updating credit card id {}, values {}...", auth.getName(), id, entity);
 		
 		/*
 		 * Looking for the entity based on the id provided by URL.
@@ -119,26 +108,14 @@ public class CreditCardController{
 		Optional<CreditCard> optional = creditCardRepository.findById(id);
 
 		if( optional.isPresent() ) {
-			CreditCard storedCreditCard = optional.get();
-			BeanUtils.copyProperties(creditCard, storedCreditCard);
-			
-			/*
-			 * Preserving the original object id...
-			 */
-			storedCreditCard.setId(id);
-			
-			/*
-			 * Updating the object specified...
-			 */
-			storedCreditCard = creditCardRepository.save(storedCreditCard);
-			
-			return new ResponseEntity<CreditCard>( storedCreditCard, HttpStatus.OK );
+			entity.setId(id);
+			creditCardRepository.save(entity);
+			return entity;
 		}else {
 			throw new EntityNotFoundException(id);
 		}
-    }
+	}
 
-	
 	/**
 	 * It creates a new credit card instance based on the message provided.
 	 * 
@@ -147,19 +124,16 @@ public class CreditCardController{
 	 * @return the new credit card instance created and its id.
 	 * 
 	 * @throws MethodArgumentNotValidException if any required credit card data was not provided.
-	 */
-	@PreAuthorize("hasAnyRole('admin', 'user')")
-	@PostMapping(produces = "application/json", consumes = "application/json")
-	public ResponseEntity<CreditCard> insert(@Valid @RequestBody CreditCard creditCard) {
-		
+	 */	
+	@Override
+	public CreditCard insert(CreditCard entity) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		logger.debug("{}: Inserting a new credit card {}...", auth.getName(), creditCard);
+		logger.debug("{}: Inserting a new credit card {}...", auth.getName(), entity);
 				
-		CreditCard savedCreditCard = creditCardRepository.save(creditCard);
-		return new ResponseEntity<CreditCard>( savedCreditCard, HttpStatus.CREATED );
-    }
+		creditCardRepository.save(entity);
+		return entity;
+	}
 
-	
 	/**
 	 * This method deletes a existing credit card represented by its id 
 	 * which is provided through the URL.
@@ -167,11 +141,9 @@ public class CreditCardController{
 	 * @param id the id that represents the credit card instance that will be deleted.
 	 * 
 	 * @throws EntityNotFoundException if the id doesn't represent a valid credit card instance.
-	 */
-	@PreAuthorize("hasAnyRole('admin')")
-	@DeleteMapping(path = "/{id}")
-	public ResponseEntity<?> delete(@PathVariable String id) throws EntityNotFoundException {
-
+	 */	
+	@Override
+	public void delete(String id) throws EntityNotFoundException {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		logger.debug("{}: Deleting a credit card id {}...", auth.getName(), id);
 		
@@ -180,9 +152,8 @@ public class CreditCardController{
 		if( optional.isPresent() ) {
 			CreditCard creditCard = optional.get();
 			creditCardRepository.delete(creditCard);
-			return new ResponseEntity<>( HttpStatus.OK );
 		}else {
 			throw new EntityNotFoundException(id);
 		}
-    }
+	}
 }

@@ -6,5 +6,4 @@ import com.finance.domain.CreditCard;
 
 public interface CreditCardRepository extends PagingAndSortingRepository<CreditCard, String>{
 
-	
 }

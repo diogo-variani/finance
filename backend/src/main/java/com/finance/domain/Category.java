@@ -22,6 +22,15 @@ public class Category extends BaseEntity {
 	@Transient
 	@Valid
 	private List<Category> subCategories;
+	
+	public Category() {}
+	
+	public Category(String id, String title, String description, String parentId) {
+		super(id);
+		this.title = title;
+		this.description = description;
+		this.parentId = parentId;
+	}
 
 	public String getTitle() {
 		return title;

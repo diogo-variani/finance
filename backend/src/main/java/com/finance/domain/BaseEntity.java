@@ -10,6 +10,12 @@ public abstract class BaseEntity {
 	@Pattern(regexp = "\\A(?!\\s*\\Z).+", message = "The id must not be empty")
 	protected String id;
 	
+	public BaseEntity() {}
+	
+	public BaseEntity(String id) {
+		this.id = id;
+	}
+	
 	public String getId() {
 		return id;
 	}
