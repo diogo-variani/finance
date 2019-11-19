@@ -4,7 +4,7 @@ import javax.validation.constraints.Pattern;
 
 import org.springframework.data.annotation.Id;
 
-public abstract class BaseEntity {
+public abstract class BaseEntity implements Cloneable{
 
 	@Id
 	@Pattern(regexp = "\\A(?!\\s*\\Z).+", message = "The id must not be empty")
@@ -47,5 +47,10 @@ public abstract class BaseEntity {
 		} else if (!id.equals(other.id))
 			return false;
 		return true;
+	}
+	
+	@Override
+	public BaseEntity clone() throws CloneNotSupportedException {
+		return (BaseEntity) super.clone();
 	}
 }

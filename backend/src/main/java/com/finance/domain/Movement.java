@@ -48,6 +48,21 @@ public class Movement extends BaseEntity {
 	@NotNull(message = "The flat isDebit must be specified")
 	private Boolean isDebit;
 
+	public Movement() {}
+	
+	public Movement(String id, String store, BigDecimal value, String categoryId, String bankAccountId, String creditCardId, Date purchaseDate, Date paymentDate, Boolean isDebit) {
+		super(id);
+		
+		this.store = store;
+		this.value = value;
+		this.categoryId = categoryId;
+		this.bankAccountId = bankAccountId;
+		this.creditCardId = creditCardId;
+		this.purchaseDate = purchaseDate;
+		this.paymentDate = paymentDate;
+		this.isDebit = isDebit;
+	}
+	
 	public String getStore() {
 		return store;
 	}

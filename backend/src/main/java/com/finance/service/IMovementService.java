@@ -30,7 +30,7 @@ import com.finance.exception.EntityNotFoundException;
  * @author diogo.variani@gmail.com
  */
 public interface IMovementService {
-
+	
 	@GetMapping(produces = "application/json")
 	public Map<String, Object> filter( 	@RequestParam(name = "page", required = false, defaultValue = "0") Integer page, 
 			@RequestParam(name = "size", required = false, defaultValue = "10") Integer size, 

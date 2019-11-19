@@ -2,6 +2,9 @@ package com.finance;
 
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 
+import java.io.IOException;
+
+import org.bson.types.ObjectId;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,5 +46,13 @@ public abstract class AbstractTest {
 	
 	protected String toJson( Object object ) throws JsonProcessingException {
 		return MAPPER.writeValueAsString(object);
+	}
+	
+	protected <T> T toObject( String json, Class<T> clazz ) throws IOException {
+		return MAPPER.readValue(json, clazz);
+	}
+	
+	protected String generateId() {
+		return new ObjectId().toHexString();
 	}
 }

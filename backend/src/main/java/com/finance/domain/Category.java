@@ -80,4 +80,5 @@ public class Category extends BaseEntity {
 	public String toString() {
 		return "Category [title=" + title + ", description=" + description + ", subCategories=" + subCategories + "]";
 	}
+	
 }
