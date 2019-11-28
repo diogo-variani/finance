@@ -1,28 +1,28 @@
 spring:
    data:
       mongodb:
-         host: 127.0.0.1
+         host: finance-database
          port: 27017
          database: finance
          username: finance-user
          password: finance-user
 
    jackson:
-      default-property-inclusion: NON_NULL
+      default-property-inclusion: NON_NULL 
 
 logging:
    level:
       org.springframework.data.mongodb.core.MongoTemplate: INFO
-      org.springframework.security: INFO
+      org.springframework.security: DEBUG
       com.finance: DEBUG
 
 keycloak:
    realm: finance
-   auth-server-url: http://localhost:8180/auth
+   auth-server-url: http://finance-identity:8080/auth
    ssl-required: external
    resource: finance-manager
    credentials:
-      secret: 30d2f5b8-d228-491e-8376-e0728bb55043
+      secret: 22e008c4-5b13-41d1-bfc5-a6f44edcab0a
    use-resource-role-mappings :  true
    bearer-only: true
    principal-attribute: preferred_username

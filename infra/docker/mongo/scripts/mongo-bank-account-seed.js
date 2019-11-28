@@ -5,11 +5,6 @@
 conn = new Mongo();
 db = conn.getDB("finance");
 
-print("Please, provide finance-user password...")
-db.auth("finance-user", passwordPrompt())
-
-var bulk = db.bankAccounts.initializeOrderedBulkOp();
-
 print("Inserting bank accounts....")
 
 db.bankAccounts.insert([ 

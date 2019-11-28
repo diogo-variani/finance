@@ -77,9 +77,14 @@
 		<dependency>
 		    <groupId>org.apache.commons</groupId>
 		    <artifactId>commons-lang3</artifactId>
-		    <version>3.9</version>
 		    <scope>test</scope>
 		</dependency>
+		
+		<dependency>
+    		<groupId>org.springframework.boot</groupId>
+    		<artifactId>spring-boot-devtools</artifactId>
+    		<optional>true</optional>
+  		</dependency>
 
 	</dependencies>
 
@@ -139,6 +144,15 @@
 						</configuration>
 					</execution>
 				</executions>
+			</plugin>
+			
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+                	<excludeDevtools>false</excludeDevtools>
+                	<addResources>true</addResources>
+            	</configuration>
 			</plugin>
 
 		</plugins>

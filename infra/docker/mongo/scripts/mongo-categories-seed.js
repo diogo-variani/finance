@@ -46,9 +46,6 @@ function insertChildren( parent, children ){
 conn = new Mongo();
 db = conn.getDB("finance");
 
-print("Please, provide finance-user password...")
-db.auth("finance-user", passwordPrompt())
-
 // Insert roots
 insertRoots(
 	[

@@ -1,16 +1,4 @@
 conn = new Mongo();
-db = conn.getDB("admin");
-
-db.adminCommand(
-	{
-		createUser: "admin",
-		pwd: "admin",  // or passwordPrompt()
-		roles: [
-			{ role: "dbOwner", db: "admin" },
-			{ role: "root", db: "admin" }
-		]
-	}
-)
 
 db = conn.getDB("finance");
 
@@ -26,5 +14,4 @@ db.createUser({
 	roles: ["readWrite"]
 })
 
-db = conn.getDB("admin");
-db.adminCommand( { shutdown: 1, force: true } )
+db.logout()

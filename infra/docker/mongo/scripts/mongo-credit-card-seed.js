@@ -5,9 +5,6 @@
 conn = new Mongo();
 db = conn.getDB("finance");
 
-print("Please, provide finance-user password...")
-db.auth("finance-user", passwordPrompt())
-
 var bulk = db.creditCards.initializeOrderedBulkOp();
 
 print("Inserting credit cards....")
@@ -19,5 +16,3 @@ db.creditCards.insert([
 
 
 db.logout()
-
-print("FINISHED!")

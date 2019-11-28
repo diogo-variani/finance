@@ -1,0 +1,50 @@
+version: '3.7'
+
+services:
+
+  database-server:
+    image: 'mongo'
+    container_name: 'finance-database'
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=finance-database-root
+      - MONGO_INITDB_ROOT_PASSWORD=finance-database-root
+    ports:
+      - 27017:27017
+    volumes:
+      - ./mongo/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - finance-backend
+
+  identity-server:
+    image: 'jboss/keycloak'
+    container_name: 'finance-identity'
+    environment: 
+      - KEYCLOAK_USER=finance-identity-root
+      - KEYCLOAK_PASSWORD=finance-identity-root
+      - KEYCLOAK_IMPORT=/tmp/realm.json
+    ports:
+      - 8081:8080
+    volumes:
+      - ./keycloak/realm.json:/tmp/realm.json        
+    networks:
+      - finance-backend
+  
+  backend-server:
+    image: 'maven'
+    container_name: 'finance-backend'
+    ports:
+      - 8080:8080
+    volumes:
+      - ../../backend:/usr/src/finance
+    networks:
+      - finance-backend
+    working_dir: /usr/src/finance
+    #stdin_open: true
+    #tty: true
+    #entrypoint: sh
+    depends_on:
+      - database-server
+    command: mvn spring-boot:run
+  
+networks:
+  finance-backend:
