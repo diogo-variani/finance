@@ -16,7 +16,7 @@ import * as moment from 'moment';
 })
 export class MovementService extends FinanceService<Movement>{
   
-  private _endpoint = 'http://localhost:8080/movements';
+  private _endpoint = 'http://finance-backend-proxy:81/finance/movements';
   
   constructor( protected http: HttpClient ) {
     super( http );

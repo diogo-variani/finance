@@ -20,7 +20,7 @@ import org.springframework.security.web.authentication.session.SessionAuthentica
 @EnableWebSecurity(/*debug = true*/)
 @EnableGlobalMethodSecurity( securedEnabled = true, prePostEnabled = true, proxyTargetClass = true)
 public class KeycloakConfig extends KeycloakWebSecurityConfigurerAdapter {
-
+ 
 	@Autowired
 	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
 		SimpleAuthorityMapper mapper = new SimpleAuthorityMapper();

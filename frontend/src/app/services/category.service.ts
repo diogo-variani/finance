@@ -10,7 +10,7 @@ import { FinanceService } from './finance.service';
 })
 export class CategoryService extends FinanceService<Category>{
   
-  private _endpoint = 'http://localhost:8080/categories';
+  private _endpoint = 'http://finance-backend-proxy:81/finance/categories';
 
   constructor( protected http: HttpClient ) {
     super( http );

@@ -9,7 +9,7 @@ import { BankAccount } from '../models/bank-account';
 })
 export class BankAccountService extends FinanceService<BankAccount>{
   
-  private _endpoint = 'http://localhost:8080/bankAccounts';
+  private _endpoint = 'http://finance-backend-proxy:81/finance/bankAccounts';
 
   constructor( protected http: HttpClient ) {
     super( http );
