@@ -2,9 +2,12 @@ version: '3.7'
 
 services:
 
+  # mongodb://finance-user:finance-user@database.finance.com.br:80/finance
   database-server:
     image: 'mongo'
     container_name: 'finance-database'
+    extra_hosts:
+      - "host.docker.internal:$DOCKER_HOST_IP"    
     environment:
       - MONGO_INITDB_ROOT_USERNAME=finance-database-root
       - MONGO_INITDB_ROOT_PASSWORD=finance-database-root      
@@ -16,17 +19,21 @@ services:
       - finance-network
 
     # https://lists.jboss.org/pipermail/keycloak-user/2018-June/014337.html
+
+    #http://172.23.0.3:8080/auth/realms/finance/.well-known/openid-configuration
+    #http://identity.finance.com.br/auth/realms/finance/.well-known/openid-configuration
   identity-server:
     image: 'jboss/keycloak'
     container_name: 'finance-identity'
+    extra_hosts:
+      - "host.docker.internal:$DOCKER_HOST_IP"    
     environment: 
       - KEYCLOAK_USER=finance-identity-root
       - KEYCLOAK_PASSWORD=finance-identity-root
       - KEYCLOAK_IMPORT=/tmp/realm.json
-      - KEYCLOAK_HTTP_PORT=9080
       - PROXY_ADDRESS_FORWARDING=true      
     ports:
-      - 9080:9080
+      - 9080:8080
     volumes:      
       - ./keycloak/realm.json:/tmp/realm.json      
     networks:
@@ -35,11 +42,13 @@ services:
   backend-server:
     image: 'maven'
     container_name: 'finance-backend'
+    extra_hosts:
+      - "host.docker.internal:$DOCKER_HOST_IP"
+      - "identity.finance.com.br:$HOST_IP"    
     ports:
       - 8080:8080
     volumes:
       - ../../backend:/usr/src/finance
-      - C:/dev-tools/apache-maven-3.6.2/conf/settings.xml:/usr/share/maven/ref/settings.xml
     networks:
       - finance-network
     working_dir: /usr/src/finance
@@ -47,18 +56,17 @@ services:
       - database-server
       - identity-server
     command: >
-      bash -c "export HTTP_PROXY=http://proxy.corp.panalpina.com:10139
-      && export HTTPS_PROXY=http://proxy.corp.panalpina.com:10139
-      && mvn spring-boot:run -Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true -Dmaven.wagon.http.ssl.ignore.validity.dates=true"
+      bash -c "mvn spring-boot:run -Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true -Dmaven.wagon.http.ssl.ignore.validity.dates=true"
 
-  backend-proxy-server:
-      image: nginx      
-      container_name: finance-backend-proxy
+  proxy-server:
+      image: nginx
+      container_name: finance-proxy
+      extra_hosts:
+        - "host.docker.internal:$DOCKER_HOST_IP"      
       ports:
-        - 81:81
-      volumes:      
-        - ./nginx-backend/nginx-finance-backend.conf:/etc/nginx/conf.d/nginx-finance-backend.conf
-        #  - ./nginx-backend/nginx.conf:/etc/nginx/nginx.conf
+        - 80:80
+      volumes:        
+        - ./nginx-backend/:/etc/nginx/:ro
       depends_on:
         - backend-server
       networks:
@@ -68,6 +76,8 @@ services:
   frontend-server:
       image: 'node'
       container_name: finance-frontend
+      extra_hosts:
+        - "host.docker.internal:$DOCKER_HOST_IP"          
       working_dir: /home/node/app
       volumes:
         - ../../frontend/:/home/node/app/
@@ -76,13 +86,9 @@ services:
       networks:
         - finance-network
       depends_on:
-       - backend-proxy-server
+       - proxy-server
       command: >
-        bash -c "export HTTP_PROXY=http://proxy.corp.panalpina.com:10139
-        && export HTTPS_PROXY=http://proxy.corp.panalpina.com:10139
-        && npm config set proxy http://proxy.corp.panalpina.com:10139
-        && npm config set https-proxy http://proxy.corp.panalpina.com:10139
-        && npm config set strict-ssl false
+        bash -c "npm config set strict-ssl false
         && echo n | npm install -g @angular/cli@8.0.1
         && npm install
         && ng serve --host 0.0.0.0"

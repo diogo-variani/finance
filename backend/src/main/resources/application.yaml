@@ -18,11 +18,11 @@ logging:
 
 keycloak:
    realm: finance
-   auth-server-url: http://finance-backend-proxy:81/auth
+   auth-server-url: http://identity.finance.com.br/auth
    ssl-required: external
    resource: finance-manager
    credentials:
-      secret: 552795b4-ea24-409b-a18f-3afe12abeb47
+      secret: 78f59ce6-ae53-44a7-9ac8-36482164b7e8
    use-resource-role-mappings :  true
    bearer-only: true
    principal-attribute: preferred_username
