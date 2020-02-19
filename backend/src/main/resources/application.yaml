@@ -8,7 +8,7 @@ spring:
          password: finance-user
 
    jackson:
-      default-property-inclusion: NON_NULL 
+      default-property-inclusion: NON_NULL
 
 logging:
    level:
@@ -18,11 +18,11 @@ logging:
 
 keycloak:
    realm: finance
-   auth-server-url: http://identity.finance.com.br/auth
+   auth-server-url: http://identity.finance.com.br:8080/auth
    ssl-required: external
    resource: finance-manager
    credentials:
-      secret: 78f59ce6-ae53-44a7-9ac8-36482164b7e8
+      secret: 685aa0fa-c830-465d-95ff-895c1830760a
    use-resource-role-mappings :  true
    bearer-only: true
    principal-attribute: preferred_username

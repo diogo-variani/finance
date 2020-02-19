@@ -1,0 +1,67 @@
+{
+  "realm" : "finance",
+  "users" : [ {
+    "id" : "04242099-a516-461d-a3f3-e7250ee82004",
+    "createdTimestamp" : 1582060487254,
+    "username" : "finance-admin",
+    "enabled" : true,
+    "totp" : false,
+    "emailVerified" : true,
+    "credentials" : [ {
+      "id" : "e290408c-0101-43b9-aa85-8443fa5336c5",
+      "type" : "password",
+      "createdDate" : 1582060497627,
+      "secretData" : "{\"value\":\"Jg+wDwGvEChChIbV5tPWLV7kplYegmxZnhG7CbSnpo3oAUKcgqd6MB8oqiEOkT1VSgwzv0TO5hSmfMxU2BXK4A==\",\"salt\":\"VkrfFDh5T6WcJlhGBS/7TA==\"}",
+      "credentialData" : "{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\"}"
+    } ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "realmRoles" : [ "offline_access", "uma_authorization" ],
+    "clientRoles" : {
+      "finance-manager" : [ "admin" ],
+      "account" : [ "view-profile", "manage-account" ]
+    },
+    "notBefore" : 0,
+    "groups" : [ ]
+  }, {
+    "id" : "572a7d0c-89e0-4022-92f1-b3a6ca93bced",
+    "createdTimestamp" : 1582060515482,
+    "username" : "finance-user",
+    "enabled" : true,
+    "totp" : false,
+    "emailVerified" : true,
+    "credentials" : [ {
+      "id" : "3874198d-fee9-42c3-bd8b-f131c98cb188",
+      "type" : "password",
+      "createdDate" : 1582060535987,
+      "secretData" : "{\"value\":\"p7nlloX+m5WYJe02Trz161Mq2JOohidkSX06oIobmXusebe2aG1jWfN7lm0/V4CiRlUirNPIji7xpovL97TnCw==\",\"salt\":\"QC+bfyFlg6ich56GHtwAlA==\"}",
+      "credentialData" : "{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\"}"
+    } ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "realmRoles" : [ "offline_access", "uma_authorization" ],
+    "clientRoles" : {
+      "finance-manager" : [ "user" ],
+      "account" : [ "view-profile", "manage-account" ]
+    },
+    "notBefore" : 0,
+    "groups" : [ ]
+  }, {
+    "id" : "5b36328d-1747-4cf4-afcf-ad375e0698e8",
+    "createdTimestamp" : 1582060354646,
+    "username" : "service-account-finance-manager",
+    "enabled" : true,
+    "totp" : false,
+    "emailVerified" : false,
+    "serviceAccountClientId" : "finance-manager",
+    "credentials" : [ ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "realmRoles" : [ "offline_access", "uma_authorization" ],
+    "clientRoles" : {
+      "account" : [ "view-profile", "manage-account" ]
+    },
+    "notBefore" : 0,
+    "groups" : [ ]
+  } ]
+}

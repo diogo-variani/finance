@@ -1,0 +1,26 @@
+{
+  "realm" : "master",
+  "users" : [ {
+    "id" : "538eecd3-df24-401a-b9f3-fde36ab7023f",
+    "createdTimestamp" : 1582060354903,
+    "username" : "finance-identity-root",
+    "enabled" : true,
+    "totp" : false,
+    "emailVerified" : false,
+    "credentials" : [ {
+      "id" : "a9df8644-f060-4ec2-a8d3-777a840973a7",
+      "type" : "password",
+      "createdDate" : 1582060354950,
+      "secretData" : "{\"value\":\"k3Jx1MXnJzjtwQcnX8/GR7+Ui3+qGgCVNpYadhKKKMNcgCl9h3ukUoOXdg6TRQj5naBoCknRj0pbd7fd0NDSMg==\",\"salt\":\"bp3+U5oVRPDXl7TI5D3FeQ==\"}",
+      "credentialData" : "{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\"}"
+    } ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "realmRoles" : [ "offline_access", "admin", "uma_authorization" ],
+    "clientRoles" : {
+      "account" : [ "view-profile", "manage-account" ]
+    },
+    "notBefore" : 0,
+    "groups" : [ ]
+  } ]
+}

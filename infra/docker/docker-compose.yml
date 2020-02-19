@@ -2,6 +2,8 @@ version: '3.7'
 
 services:
 
+  # export DOCKER_HOST_IP=$(ip -4 addr show docker0 | grep -oP '(?<=inet\s)\d+(\.\d+){3}')
+
   # mongodb://finance-user:finance-user@database.finance.com.br:80/finance
   database-server:
     image: 'mongo'
@@ -18,45 +20,70 @@ services:
     networks:
       - finance-network
 
-    # https://lists.jboss.org/pipermail/keycloak-user/2018-June/014337.html
-
-    #http://172.23.0.3:8080/auth/realms/finance/.well-known/openid-configuration
-    #http://identity.finance.com.br/auth/realms/finance/.well-known/openid-configuration
+  ############################################################################
+  #
+  #   IDENTITY SERVER (Keycloak)
+  #
+  #   https://lists.jboss.org/pipermail/keycloak-user/2018-June/014337.html
+  # 
+  # Main Local URL: http://<container-ip>:8080/auth/realms/finance/.well-known/openid-configuration
+  #                 http://identity.finance.com.br/auth/realms/finance/.well-known/openid-configuration
+  #
+  # Default command to export configuration:
+  #   standalone.sh -Dkeycloak.migration.action=export -Dkeycloak.migration.provider=dir -Dkeycloak.migration.dir=/home/centos/keycloak-export 
+  #     -Dkeycloak.migration.usersExportStrategy=SAME_FILE -Djboss.socket.binding.port-offset=1000 -c standalone-ha.xml
+  #
+  # Default user configuration:
+  #   user: finance-admin
+  #   pass: finance
+  #
+  #   user: finance-user
+  #   pass: finance
+  #
+  # Default client secret: 685aa0fa-c830-465d-95ff-895c1830760a 
+  #
+  #############################################################################
   identity-server:
     image: 'jboss/keycloak'
-    container_name: 'finance-identity'
+    #container_name: 'finance-identity'
+    container_name: 'identity.finance.com.br'
     extra_hosts:
-      - "host.docker.internal:$DOCKER_HOST_IP"    
+      - "host.docker.internal:$DOCKER_HOST_IP"
     environment: 
       - KEYCLOAK_USER=finance-identity-root
       - KEYCLOAK_PASSWORD=finance-identity-root
-      - KEYCLOAK_IMPORT=/tmp/realm.json
+      #- KEYCLOAK_IMPORT=/tmp/realm.json
       - PROXY_ADDRESS_FORWARDING=true      
     ports:
       - 9080:8080
     volumes:      
-      - ./keycloak/realm.json:/tmp/realm.json      
+      - ./keycloak/config:/tmp/keycloak/config
+    command: -b 0.0.0.0 -Djboss.http.port=8080 -Dkeycloak.migration.action=import -Dkeycloak.migration.provider=dir -Dkeycloak.migration.dir=/tmp/keycloak/config -Dkeycloak.migration.strategy=OVERWRITE_EXISTING
     networks:
       - finance-network
-  
+
   backend-server:
     image: 'maven'
-    container_name: 'finance-backend'
+    #container_name: 'finance-backend'
+    container_name: 'backend.finance.com.br'
     extra_hosts:
-      - "host.docker.internal:$DOCKER_HOST_IP"
-      - "identity.finance.com.br:$HOST_IP"    
+      - "host.docker.internal:$DOCKER_HOST_IP" 
     ports:
       - 8080:8080
+      - 5005:5005 #Remote debug port
     volumes:
       - ../../backend:/usr/src/finance
+      - ~/.m2:/root/.m2
     networks:
       - finance-network
     working_dir: /usr/src/finance
+    #links: 
+    #  - identity-server:identity.finance.com.br
     depends_on:
       - database-server
       - identity-server
     command: >
-      bash -c "mvn spring-boot:run -Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true -Dmaven.wagon.http.ssl.ignore.validity.dates=true"
+      bash -c "mvn spring-boot:run -Dspring-boot.run.jvmArguments='-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=*:5005'"
 
   proxy-server:
       image: nginx

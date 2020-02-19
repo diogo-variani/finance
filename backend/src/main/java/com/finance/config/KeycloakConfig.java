@@ -18,7 +18,7 @@ import org.springframework.security.web.authentication.session.SessionAuthentica
 
 @KeycloakConfiguration
 @EnableWebSecurity(/*debug = true*/)
-@EnableGlobalMethodSecurity( securedEnabled = true, prePostEnabled = true, proxyTargetClass = true)
+@EnableGlobalMethodSecurity( securedEnabled = true, prePostEnabled = true/*, proxyTargetClass = true*/)
 public class KeycloakConfig extends KeycloakWebSecurityConfigurerAdapter {
  
 	@Autowired
