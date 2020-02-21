@@ -7,7 +7,7 @@ services:
   # mongodb://finance-user:finance-user@database.finance.com.br:80/finance
   database-server:
     image: 'mongo'
-    container_name: 'finance-database'
+    container_name: 'database.finance.com.br'
     extra_hosts:
       - "host.docker.internal:$DOCKER_HOST_IP"    
     environment:
@@ -52,13 +52,14 @@ services:
     environment: 
       - KEYCLOAK_USER=finance-identity-root
       - KEYCLOAK_PASSWORD=finance-identity-root
-      #- KEYCLOAK_IMPORT=/tmp/realm.json
-      - PROXY_ADDRESS_FORWARDING=true      
+      - PROXY_ADDRESS_FORWARDING=true
+      #- KEYCLOAK_LOGLEVEL=DEBUG
+      #- ROOT_LOGLEVEL=DEBUG
     ports:
-      - 9080:8080
+      - 9080:9080
     volumes:      
       - ./keycloak/config:/tmp/keycloak/config
-    command: -b 0.0.0.0 -Djboss.http.port=8080 -Dkeycloak.migration.action=import -Dkeycloak.migration.provider=dir -Dkeycloak.migration.dir=/tmp/keycloak/config -Dkeycloak.migration.strategy=OVERWRITE_EXISTING
+    command: -b 0.0.0.0 -Djboss.http.port=9080 -Dkeycloak.migration.action=import -Dkeycloak.migration.provider=dir -Dkeycloak.migration.dir=/tmp/keycloak/config -Dkeycloak.migration.strategy=OVERWRITE_EXISTING
     networks:
       - finance-network
 
@@ -87,15 +88,15 @@ services:
 
   proxy-server:
       image: nginx
-      container_name: finance-proxy
+      container_name: 'proxy.finance.com.br'
       extra_hosts:
         - "host.docker.internal:$DOCKER_HOST_IP"      
       ports:
         - 80:80
       volumes:        
         - ./nginx-backend/:/etc/nginx/:ro
-      depends_on:
-        - backend-server
+      #depends_on:
+      #  - backend-server
       networks:
         - finance-network
       command: ['nginx-debug', '-g', 'daemon off;']

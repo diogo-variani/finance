@@ -1,7 +1,7 @@
 spring:
    data:
       mongodb:
-         host: finance-database
+         host: database.finance.com.br
          port: 27017
          database: finance
          username: finance-user
@@ -15,10 +15,12 @@ logging:
       org.springframework.data.mongodb.core.MongoTemplate: INFO
       org.springframework.security: DEBUG
       com.finance: DEBUG
+      org.keycloak.adapters: DEBUG
 
 keycloak:
    realm: finance
-   auth-server-url: http://identity.finance.com.br:8080/auth
+   auth-server-url: http://identity.finance.com.br:9080/auth
+   #auth-server-url: http://identity.finance.com.br/auth
    ssl-required: external
    resource: finance-manager
    credentials:

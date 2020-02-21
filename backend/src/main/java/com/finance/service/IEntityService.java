@@ -60,7 +60,7 @@ public interface IEntityService<T extends BaseEntity> {
 	 * @throws EntityNotFoundException 			if the id doesn't represent a valid entity instance.
 	 * @throws MethodArgumentNotValidException 	if any required entity data was not provided.
 	 */	
-	@PreAuthorize("hasAnyRole('admin', 'user')")
+	@PreAuthorize("hasAnyAuthority('admin', 'user')")
 	@PutMapping(path = "/{id}", consumes="application/json", produces = "application/json")
     public T update(@PathVariable String id, @RequestBody @Valid T entity) throws EntityNotFoundException;
 	
@@ -73,7 +73,7 @@ public interface IEntityService<T extends BaseEntity> {
 	 * 
 	 * @throws MethodArgumentNotValidException if any required entity data was not provided.
 	 */	
-	@PreAuthorize("hasAnyRole('admin', 'user')")
+	@PreAuthorize("hasAnyAuthority('admin', 'user')")
 	@PostMapping(produces = "application/json", consumes = "application/json")
 	@ResponseStatus(value = HttpStatus.CREATED)
 	public T insert(@Valid @RequestBody T entity);
@@ -86,7 +86,7 @@ public interface IEntityService<T extends BaseEntity> {
 	 * 
 	 * @throws EntityNotFoundException 		if the id doesn't represent a valid entity instance.
 	 */	
-	@PreAuthorize("hasAnyRole('admin')")
+	@PreAuthorize("hasAnyAuthority('admin')")
 	@DeleteMapping(path = "/{id}")
 	@ResponseStatus(value = HttpStatus.OK)
 	public void delete(@PathVariable String id) throws EntityNotFoundException;	

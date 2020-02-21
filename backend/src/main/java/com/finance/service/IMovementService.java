@@ -50,20 +50,20 @@ public interface IMovementService {
 	@GetMapping(path = "/{id}", produces = "application/json")
     public Movement getById(@PathVariable String id) throws EntityNotFoundException;
 	
-	@PreAuthorize("hasAnyRole('admin', 'user')")
+	@PreAuthorize("hasAnyAuthority('admin', 'user')")
 	@PostMapping(produces = "application/json", consumes = "application/json")
 	@ResponseStatus(value = HttpStatus.CREATED)
 	public Movement insert(@Valid @RequestBody Movement movement);
 	
-	@PreAuthorize("hasAnyRole('admin', 'user')")
+	@PreAuthorize("hasAnyAuthority('admin', 'user')")
 	@PutMapping(path = "/{id}", consumes="application/json", produces = "application/json")
     public Movement update(@PathVariable String id, @RequestBody @Valid Movement movement) throws EntityNotFoundException; 	
 	
-	@PreAuthorize("hasAnyRole('admin', 'user')")
+	@PreAuthorize("hasAnyAuthority('admin', 'user')")
 	@DeleteMapping(path = "/{id}")
 	public void delete(@PathVariable String id) throws EntityNotFoundException;	
 	
-	@PreAuthorize("hasAnyRole('admin', 'user')")
+	@PreAuthorize("hasAnyAuthority('admin', 'user')")
 	@DeleteMapping(produces = "application/json")
 	@ResponseStatus(value = HttpStatus.OK)
 	public void delete(@RequestParam(name = "ids") List<String> ids ) throws EntityNotFoundException;
