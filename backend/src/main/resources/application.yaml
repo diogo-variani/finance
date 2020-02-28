@@ -20,7 +20,7 @@ logging:
 keycloak:
    realm: finance
    auth-server-url: http://identity.finance.com.br:9080/auth
-   #auth-server-url: http://identity.finance.com.br/auth
+   #auth-server-url: http://proxy.finance.com.br/auth
    ssl-required: external
    resource: finance-manager
    credentials:
