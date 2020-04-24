@@ -32,6 +32,7 @@ import { EditModeDirective } from './components/shared/editable/edit-mode.direct
 import { EditableOnEnterDirective } from './components/shared/editable/editable-on-enter.directive';
 import { GlobalErrorHandler } from './error-handlers/global-error-handler';
 import { ServerErrorInterceptor } from './error-handlers/server-error.interceptor';
+import { LoginComponent } from './components/login/login.component';
 
 @NgModule({
   declarations: [
@@ -51,7 +52,8 @@ import { ServerErrorInterceptor } from './error-handlers/server-error.intercepto
     EditableComponent,
     ViewModeDirective,
     EditModeDirective,    
-    EditableOnEnterDirective
+    EditableOnEnterDirective,
+    LoginComponent
   ],
   imports: [
     HttpClientModule,
