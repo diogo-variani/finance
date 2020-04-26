@@ -10,7 +10,7 @@ import { HttpClient } from '@angular/common/http';
 })
 export class CreditCardService extends FinanceService<CreditCard>{
   
-  private _endpoint = 'http://finance-backend-proxy:81/finance/creditCards';
+  private _endpoint = '/api/finance/creditCards';
 
   constructor( protected http: HttpClient ) {
     super( http );

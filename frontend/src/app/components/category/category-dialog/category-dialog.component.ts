@@ -42,8 +42,6 @@ export class CategoryDialogComponent implements OnInit, OnDestroy {
     private _categoryTreeService: CategoryTreeService,
     private _formBuilder: FormBuilder,
     private _notificationService: NotificationService) {
-            
-      
   }
 
   ngOnInit() {

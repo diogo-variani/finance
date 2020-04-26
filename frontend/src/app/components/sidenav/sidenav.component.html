@@ -6,7 +6,7 @@
       Menu
     </mat-toolbar>
 
-    <mat-list>
+    <mat-list *ngIf="isLoggedIn">
 
       <mat-list-item routerLink='/'>
         <mat-icon matListIcon>home</mat-icon>

@@ -35,7 +35,7 @@ export class AuthenticationService {
         
         console.log( body.toString() );
 
-        return this.http.post<any>(`http://identity.finance.com.br/auth/realms/finance/protocol/openid-connect/token`, body.toString(), { headers: this.DEFAULT_HEADERS} )
+        return this.http.post<any>(`/token`, body.toString(), { headers: this.DEFAULT_HEADERS} )
             .pipe(map(user => {
                 console.log( user );
                 // store user details and jwt token in local storage to keep user logged in between page refreshes
