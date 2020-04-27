@@ -6,7 +6,10 @@ import { AuthenticationService } from 'src/app/services';
 
 // import { AlertService, AuthenticationService } from '@/_services';
 
-@Component({ templateUrl: 'login.component.html' })
+@Component({ 
+    templateUrl: './login.component.html',
+    styleUrls: ['./login.component.scss']
+})
 export class LoginComponent implements OnInit {
     loginForm: FormGroup;
     loading = false;
@@ -21,7 +24,7 @@ export class LoginComponent implements OnInit {
         // private alertService: AlertService
     ) {
         // redirect to home if already logged in
-        if (this.authenticationService.currentUserValue) {
+        if (this.authenticationService.isAuthenticated()) {
             this.router.navigate(['/']);
         }
     }

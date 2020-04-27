@@ -33,6 +33,7 @@ import { EditableOnEnterDirective } from './components/shared/editable/editable-
 import { GlobalErrorHandler } from './error-handlers/global-error-handler';
 import { ServerErrorInterceptor } from './error-handlers/server-error.interceptor';
 import { LoginComponent } from './components/login/login.component';
+import { JwtInterceptor } from './helpers/jwt.interceptor';
 
 @NgModule({
   declarations: [
@@ -78,7 +79,8 @@ import { LoginComponent } from './components/login/login.component';
   providers: [
     {provide: MAT_SNACK_BAR_DEFAULT_OPTIONS, useValue: {duration: 2000, horizontalPosition: 'center'}},
     { provide: ErrorHandler, useClass: GlobalErrorHandler },
-    { provide: HTTP_INTERCEPTORS, useClass: ServerErrorInterceptor, multi: true }
+    { provide: HTTP_INTERCEPTORS, useClass: ServerErrorInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true }
   ],
   bootstrap: [AppComponent]
 })

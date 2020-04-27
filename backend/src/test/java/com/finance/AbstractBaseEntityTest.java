@@ -40,7 +40,7 @@ public abstract class AbstractBaseEntityTest<T extends BaseEntity, R extends Pag
 		
 		this.mockMvc.perform(get(endpoint))
         .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
         .andExpect(jsonPath("$", hasSize(entities.size())));
 	}
 	
@@ -54,7 +54,7 @@ public abstract class AbstractBaseEntityTest<T extends BaseEntity, R extends Pag
 		
 		this.mockMvc.perform(get(endpoint))
         	.andExpect(status().isOk())
-        	.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+        	.andExpect(content().contentType(MediaType.APPLICATION_JSON))
         	.andExpect(jsonPath("$", hasSize(0)));
 	}
 	
@@ -92,7 +92,7 @@ public abstract class AbstractBaseEntityTest<T extends BaseEntity, R extends Pag
 		this.mockMvc.perform(get(endpoint, id))
         	.andExpect(status().isNotFound())
         	/*.andDo(MockMvcResultHandlers.print())*/
-        	.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8));
+        	.andExpect(content().contentType(MediaType.APPLICATION_JSON));
 	}
 	
 	@Test
@@ -108,10 +108,10 @@ public abstract class AbstractBaseEntityTest<T extends BaseEntity, R extends Pag
 		
 		given(repository.save(entity)).willReturn(entity);
 		
-		ResultActions resultActions = this.mockMvc.perform(post(endpoint).contentType(MediaType.APPLICATION_JSON_UTF8).content(payload))
+		ResultActions resultActions = this.mockMvc.perform(post(endpoint).contentType(MediaType.APPLICATION_JSON).content(payload))
 			/*.andDo(MockMvcResultHandlers.print())*/
         	.andExpect(status().isCreated())
-        	.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8));
+        	.andExpect(content().contentType(MediaType.APPLICATION_JSON));
 		
 		checkBody( resultActions, entity );
 	}
@@ -125,10 +125,10 @@ public abstract class AbstractBaseEntityTest<T extends BaseEntity, R extends Pag
 		T entity = entities.get(0);
 		String payload = toJson(entity);
 		
-		this.mockMvc.perform(post(endpoint).contentType(MediaType.APPLICATION_JSON_UTF8).content(payload))
+		this.mockMvc.perform(post(endpoint).contentType(MediaType.APPLICATION_JSON).content(payload))
 			/*.andDo(MockMvcResultHandlers.print())*/
         	.andExpect(status().isForbidden())
-        	.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8));
+        	.andExpect(content().contentType(MediaType.APPLICATION_JSON));
 	}
 	
 	@Test
@@ -143,10 +143,10 @@ public abstract class AbstractBaseEntityTest<T extends BaseEntity, R extends Pag
 		removeRequiredData(clone);
 		String payload = toJson(clone);
 		
-		this.mockMvc.perform(post(endpoint).contentType(MediaType.APPLICATION_JSON_UTF8).content(payload))
+		this.mockMvc.perform(post(endpoint).contentType(MediaType.APPLICATION_JSON).content(payload))
 			/*.andDo(MockMvcResultHandlers.print())*/
         	.andExpect(status().isBadRequest())
-        	.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+        	.andExpect(content().contentType(MediaType.APPLICATION_JSON))
         	.andExpect(jsonPath("$.description", equalTo("Payload is not valid")))
         	.andExpect(jsonPath("$.errors", hasSize( greaterThan(0) ) ));
 	}
@@ -166,10 +166,10 @@ public abstract class AbstractBaseEntityTest<T extends BaseEntity, R extends Pag
 		given(repository.findById(id)).willReturn(Optional.of(entity));
 		given(repository.save(entity)).willReturn(entity);
 		
-		ResultActions resultActions = this.mockMvc.perform(put(endpoint, id).contentType(MediaType.APPLICATION_JSON_UTF8).content(payload))
+		ResultActions resultActions = this.mockMvc.perform(put(endpoint, id).contentType(MediaType.APPLICATION_JSON).content(payload))
 			/*.andDo(MockMvcResultHandlers.print())*/
         	.andExpect(status().isOk())
-        	.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8));
+        	.andExpect(content().contentType(MediaType.APPLICATION_JSON));
         	
 		checkBody(resultActions, entity);
 	}
@@ -185,10 +185,10 @@ public abstract class AbstractBaseEntityTest<T extends BaseEntity, R extends Pag
 		String id = entity.getId();
 		String payload = toJson(entity);
 		
-		this.mockMvc.perform(put(endpoint, id).contentType(MediaType.APPLICATION_JSON_UTF8).content(payload))
+		this.mockMvc.perform(put(endpoint, id).contentType(MediaType.APPLICATION_JSON).content(payload))
 			/*.andDo(MockMvcResultHandlers.print())*/
         	.andExpect(status().isForbidden())
-        	.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8));
+        	.andExpect(content().contentType(MediaType.APPLICATION_JSON));
 	}
 	
 	@Test
@@ -206,10 +206,10 @@ public abstract class AbstractBaseEntityTest<T extends BaseEntity, R extends Pag
 		
 		given(repository.findById(id)).willReturn(Optional.empty());
 		
-		this.mockMvc.perform(put(endpoint, id).contentType(MediaType.APPLICATION_JSON_UTF8).content(payload))
+		this.mockMvc.perform(put(endpoint, id).contentType(MediaType.APPLICATION_JSON).content(payload))
 			/*.andDo(MockMvcResultHandlers.print())*/
         	.andExpect(status().isNotFound())
-        	.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8));
+        	.andExpect(content().contentType(MediaType.APPLICATION_JSON));
 	}
 	
 	@Test
@@ -227,10 +227,10 @@ public abstract class AbstractBaseEntityTest<T extends BaseEntity, R extends Pag
 		
 		String payload = toJson(clone);
 		
-		this.mockMvc.perform(put(endpoint, id).contentType(MediaType.APPLICATION_JSON_UTF8).content(payload))
+		this.mockMvc.perform(put(endpoint, id).contentType(MediaType.APPLICATION_JSON).content(payload))
 			/*.andDo(MockMvcResultHandlers.print())*/
         	.andExpect(status().isBadRequest())
-        	.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+        	.andExpect(content().contentType(MediaType.APPLICATION_JSON))
         	.andExpect(jsonPath("$.description", equalTo("Payload is not valid")))
         	.andExpect(jsonPath("$.errors", hasSize( greaterThan(0) ) ));
 	}
@@ -287,7 +287,7 @@ public abstract class AbstractBaseEntityTest<T extends BaseEntity, R extends Pag
 		this.mockMvc.perform(delete(endpoint, id))
 			/*.andDo(MockMvcResultHandlers.print())*/
         	.andExpect(status().isNotFound())
-        	.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8));
+        	.andExpect(content().contentType(MediaType.APPLICATION_JSON));
 	}	
 	
 	protected abstract List<T> getEntities();

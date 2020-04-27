@@ -5,6 +5,5 @@ export * from './category.service';
 export * from './credit-card.service';
 export * from './error.service';
 export * from './finance.service';
-export * from './logging.service';
 export * from './movement.service';
 export * from './notification.service';

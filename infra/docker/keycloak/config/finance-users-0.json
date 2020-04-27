@@ -7,6 +7,9 @@
     "enabled" : true,
     "totp" : false,
     "emailVerified" : true,
+    "firstName" : "Diogo",
+    "lastName" : "Variani",
+    "email" : "diogo.variani@gmail.com",
     "credentials" : [ {
       "id" : "e290408c-0101-43b9-aa85-8443fa5336c5",
       "type" : "password",
@@ -47,8 +50,8 @@
     "notBefore" : 0,
     "groups" : [ ]
   }, {
-    "id" : "5b36328d-1747-4cf4-afcf-ad375e0698e8",
-    "createdTimestamp" : 1582060354646,
+    "id" : "48096488-b136-4dd4-a704-a9fbf265e506",
+    "createdTimestamp" : 1587917289926,
     "username" : "service-account-finance-manager",
     "enabled" : true,
     "totp" : false,

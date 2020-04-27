@@ -30,9 +30,15 @@ services:
   #                 http://identity.finance.com.br/auth/realms/finance/.well-known/openid-configuration
   #
   # Default command to export configuration:
-  #   standalone.sh -Dkeycloak.migration.action=export -Dkeycloak.migration.provider=dir -Dkeycloak.migration.dir=/home/centos/keycloak-export 
-  #     -Dkeycloak.migration.usersExportStrategy=SAME_FILE -Djboss.socket.binding.port-offset=1000 -c standalone-ha.xml
+  #   docker exec -it identity.finance.com.br /opt/jboss/keycloak/bin/standalone.sh -Dkeycloak.migration.action=export -Dkeycloak.migration.provider=dir -Dkeycloak.migration.dir=/tmp/keycloak-export 
+  #     -Dkeycloak.migration.usersExportStrategy=SAME_FILE -Djboss.socket.binding.port-offset=100 -c standalone-ha.xml
   #
+  # Default command to copy files from exported directory to the stack
+  #   docker cp identity.finance.com.br:/tmp/keycloak-export/finance-realm.json /home/variani/dev/private/finance/infra/docker/keycloak/config/finance-realm.json
+  #   docker cp identity.finance.com.br:/tmp/keycloak-export/finance-users-0.json /home/variani/dev/private/finance/infra/docker/keycloak/config/finance-users-0.json
+  #   docker cp identity.finance.com.br:/tmp/keycloak-export/master-realm.json /home/variani/dev/private/finance/infra/docker/keycloak/config/master-realm.json
+  #   docker cp identity.finance.com.br:/tmp/keycloak-export/master-users-0.json /home/variani/dev/private/finance/infra/docker/keycloak/config/master-users-0.json
+  # 
   # Default user configuration:
   #   user: finance-admin
   #   pass: finance
@@ -64,7 +70,7 @@ services:
       - finance-network
 
   backend-server:
-    image: 'maven'
+    image: 'maven:3.6.3-openjdk-8'
     #container_name: 'finance-backend'
     container_name: 'backend.finance.com.br'
     extra_hosts:
@@ -84,7 +90,10 @@ services:
       - database-server
       - identity-server
     command: >
-      bash -c "mvn spring-boot:run -Dspring-boot.run.jvmArguments='-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=*:5005'"
+       bash -c "mvn spring-boot:run -Dspring-boot.run.jvmArguments='-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=127.0.0.1:5005'"
+
+      #command: >
+      # bash -c "mvn spring-boot:run -Dspring-boot.run.jvmArguments='-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=*:5005'"
 
   proxy-server:
       image: nginx
