@@ -10,7 +10,7 @@ import { FinanceService } from './finance.service';
 })
 export class CategoryService extends FinanceService<Category>{
   
-  private _endpoint = '/api/finance/categories';
+  private _endpoint = '/api/categories';
 
   constructor( protected http: HttpClient ) {
     super( http );

@@ -1,7 +1,7 @@
 <mat-sidenav-container class="finance-container">
 
   <mat-sidenav #sidenav class="finance-sidenav mat-elevation-z10" [opened]="!isScreenSmall()"
-    [mode]="isScreenSmall() ? 'over': 'side'" *ngIf="isLoggedIn">
+    [mode]="isScreenSmall() ? 'over': 'side'" *ngIf="isAuthenticated">
     <mat-toolbar color="primary">
       Menu
     </mat-toolbar>

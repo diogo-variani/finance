@@ -1,17 +1,12 @@
 //https://github.com/alerubis/angular-draggable-mat-tree
-import { Component, OnInit, OnDestroy } from '@angular/core';
-
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
-
-import { Category } from 'src/app/models/category';
-import { CategoryDialogComponent } from '../category-dialog/category-dialog.component';
 import { untilDestroyed } from 'ngx-take-until-destroy';
-import { CategoryTreeService } from 'src/app/services/category-tree.service';
-import { FlatTreeNode } from '../../abstract/tree/draggable-tree/draggable-tree.component';
-import { SelectableTreeComponent } from '../../abstract/tree/selectable-tree/selectable-tree.component';
-import { CategoryService } from 'src/app/services/category.service';
 import { delay } from 'rxjs/operators';
-import { NotificationService } from 'src/app/services/notification.service';
+import { Category } from 'src/app/models';
+import { CategoryService, CategoryTreeService, NotificationService } from 'src/app/services';
+import { FlatTreeNode, SelectableTreeComponent } from '../../abstract/tree';
+import { CategoryDialogComponent } from '../category-dialog/category-dialog.component';
 
 /*
  * Category flat tree node to be used in the tree.

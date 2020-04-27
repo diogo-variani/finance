@@ -1,16 +1,15 @@
-import { AuthenticationService } from 'src/app/services/authentication.service';
-import { OnInit } from '@angular/core';
+import { AuthenticationService } from 'src/app/services';
 
-export abstract class AuthComponent implements OnInit{
+export abstract class AuthComponent{
 
-  private isAuthenticated : boolean = false;
+  public isAuthenticated : boolean = false;
 
   constructor(protected authenticationService: AuthenticationService) {
-  }
-  
-  ngOnInit(): void {
-    this.authenticationService.user.subscribe( user => {
+
+    this.authenticationService.currentUserSubject.subscribe( user => {
       this.isAuthenticated = this.authenticationService.isAuthenticated();
     });
+
   }
+  
 }

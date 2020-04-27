@@ -1,17 +1,21 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, Output, EventEmitter } from '@angular/core';
+import { AuthenticationService } from 'src/app/services';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-toolbar',
   templateUrl: './toolbar.component.html',
   styleUrls: ['./toolbar.component.scss']
 })
-export class ToolbarComponent implements OnInit {
+export class ToolbarComponent {
 
   @Output() toggleSidenav = new EventEmitter<void>();
 
-  constructor() { }
+  constructor(private authenticationService : AuthenticationService,
+              private router: Router) { }
 
-  ngOnInit() {
+  public logout(){
+    this.authenticationService.logout();
+    this.router.navigate(['/login']);
   }
-
 }

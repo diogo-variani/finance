@@ -6,3 +6,4 @@ export * from './movement';
 export * from './profile';
 export * from './user';
 export * from './pagination';
+export * from './finance-entity';

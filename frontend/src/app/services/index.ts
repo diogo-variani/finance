@@ -7,3 +7,4 @@ export * from './error.service';
 export * from './finance.service';
 export * from './movement.service';
 export * from './notification.service';
+export * from './authentication.service';

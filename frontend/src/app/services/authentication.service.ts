@@ -12,8 +12,8 @@ export class AuthenticationService {
     readonly CURRENT_TOKEN : string = "currentToken";
     readonly CURRENT_USER : string = "currentUser";
 
-    private currentUserSubject: BehaviorSubject<User>;
-    private currentTokenSubject: BehaviorSubject<any>;
+    public currentUserSubject: BehaviorSubject<User>;
+    public currentTokenSubject: BehaviorSubject<any>;
 
     readonly DEFAULT_HEADERS : HttpHeaders = new HttpHeaders({
         'Content-Type': 'application/x-www-form-urlencoded'
@@ -52,9 +52,7 @@ export class AuthenticationService {
         var body = this.defaultBody;
         body = body.set('username', username)
                    .set('password', password);
-        
-        console.log( body.toString() );
-
+    
         return this.http.post<any>(`/token`, body.toString(), { headers: this.DEFAULT_HEADERS} )
             .pipe(map(token => {
             
@@ -66,7 +64,7 @@ export class AuthenticationService {
     }
 
     public isAuthenticated() : boolean {
-        return this.currentUserSubject.value != undefined;
+        return this.userFromStorage != undefined;
     }
 
     private storeToken( token : any ){
@@ -88,7 +86,9 @@ export class AuthenticationService {
 
     logout() {
         // remove user from local storage and set current user to null
-        localStorage.removeItem('currentUser');
+        localStorage.removeItem(this.CURRENT_USER);
+        localStorage.removeItem(this.CURRENT_TOKEN);
         this.currentUserSubject.next(null);
+        this.currentTokenSubject.next(null);
     }
 }

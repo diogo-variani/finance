@@ -11,7 +11,7 @@ import { tap } from 'rxjs/operators';
 })
 export class CategoryTreeService extends FinanceService<Category>{
   
-  private _endpoint = '/api/finance/categories/tree';
+  private _endpoint = '/api/categories/tree';
   
   constructor( protected http: HttpClient ) {
     super( http );

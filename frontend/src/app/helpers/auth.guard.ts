@@ -5,6 +5,7 @@ import { AuthenticationService } from '../services';
 
 @Injectable({ providedIn: 'root' })
 export class AuthGuard implements CanActivate {
+    
     constructor(
         private router: Router,
         private authenticationService: AuthenticationService
@@ -12,7 +13,7 @@ export class AuthGuard implements CanActivate {
 
     canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
         var isAuthenticated : boolean = this.authenticationService.isAuthenticated();
-        console.log( 'isAuthenticated', isAuthenticated );
+
         if (isAuthenticated) {
             // authorised so return true
             return true;

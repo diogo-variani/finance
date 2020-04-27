@@ -1,6 +1,6 @@
 import { MatDialogRef } from '@angular/material';
-import { FinanceEntity } from 'src/app/models/finance-entity';
-import { FinanceService } from 'src/app/services/finance.service';
+import { FinanceEntity } from 'src/app/models';
+import { FinanceService } from 'src/app/services';
 import { tap } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 
