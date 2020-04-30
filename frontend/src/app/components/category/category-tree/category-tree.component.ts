@@ -8,6 +8,9 @@ import { CategoryService, CategoryTreeService, NotificationService } from 'src/a
 import { FlatTreeNode, SelectableTreeComponent } from '../../abstract/tree';
 import { CategoryDialogComponent } from '../category-dialog/category-dialog.component';
 
+//https://ej2.syncfusion.com/angular/documentation/treegrid/getting-started/
+//https://ej2.syncfusion.com/angular/demos/#/material/treegrid/treegrid-overview
+
 /*
  * Category flat tree node to be used in the tree.
  */
@@ -58,8 +61,22 @@ export class CategoryTreeComponent extends SelectableTreeComponent<Category, Cat
   ngOnInit(): void {
     super.ngOnInit();
     
-    this._loadTree();    
-    this._subscribeSelectionChanges();    
+    //this._loadTree();    
+    //this._subscribeSelectionChanges();    
+
+    this._categoryTreeService.getEntities()
+    .pipe(
+      untilDestroyed(this),
+      delay( 2000 )
+    )
+    .subscribe(tree => {
+      this.categories = tree;
+      console.log( this.categories );
+      
+    }
+  );
+
+
   }
 
   ngOnDestroy(): void {        

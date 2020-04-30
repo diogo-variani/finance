@@ -18,46 +18,14 @@
   <mat-card-title>Categories</mat-card-title> 
   <mat-card-content>
     
-    <div>
-      <mat-tree [dataSource]="dataSource" [treeControl]="treeControl" class="app-category-list">
+    <ejs-treegrid [dataSource]='categories' [treeColumnIndex]='0'  [allowRowDragAndDrop]='true' childMapping='subCategories'
+    [allowFiltering]='true' [allowSorting]='true' showColumnMenu='true' enableCollapseAll='true' autoCheckHierarchy='true' >
+      <e-columns>
+          <e-column field='title' headerText='Title' textAlign='Left' width=70 [showCheckbox]='true'></e-column>
+          <e-column field='description' headerText='Description' textAlign='Left' width=200></e-column>
+      </e-columns>
+      </ejs-treegrid>
 
-        <mat-tree-node *matTreeNodeDef="let node" matTreeNodeToggle matTreeNodePadding>
-
-          <button mat-icon-button disabled></button>
-          <mat-checkbox class="checklist-leaf-node" [ngClass]="{'drop-above': dragNodeExpandOverArea === 'above' && dragNodeExpandOverNode === node,
-                                'drop-below': dragNodeExpandOverArea === 'below' && dragNodeExpandOverNode === node,
-                                'drop-center': dragNodeExpandOverArea === 'center' && dragNodeExpandOverNode === node}"
-            [checked]="selection.isSelected(node.id)" (change)="selection.toggle(node.id);" draggable="true"
-            (dragstart)="handleDragStart($event, node);" (dragover)="handleDragOver($event, node);"
-            (drop)="handleDrop($event, node);" (dragend)="handleDragEnd($event);" [matTooltip]="node.description">{{node.title}}</mat-checkbox>
-
-
-        </mat-tree-node>
-
-        <!-- This is the tree node template for expandable nodes -->
-        <mat-tree-node *matTreeNodeDef="let node; when: hasChild" matTreeNodePadding >
-
-          <button mat-icon-button matTreeNodeToggle [attr.aria-label]="'toggle ' + node.filename">
-            <mat-icon class="mat-icon-rtl-mirror">
-              {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
-            </mat-icon>
-          </button>
-
-          <mat-checkbox [ngClass]="{'drop-above': dragNodeExpandOverArea === 'above' && dragNodeExpandOverNode === node,
-                              'drop-below': dragNodeExpandOverArea === 'below' && dragNodeExpandOverNode === node,
-                              'drop-center': dragNodeExpandOverArea === 'center' && dragNodeExpandOverNode === node}"
-            draggable="true" (dragstart)="handleDragStart($event, node);" (dragover)="handleDragOver($event, node);"
-            (drop)="handleDrop($event, node);" (dragend)="handleDragEnd($event);"
-            [checked]="selection.isSelected(node.id)" (change)="selection.toggle(node.id);"
-            [indeterminate]="descendantsPartiallySelected(node)" [matTooltip]="node.description">{{node.title}}
-          </mat-checkbox>
-
-        </mat-tree-node>
-
-      </mat-tree>
-
-      <span #emptyItem></span>
-    </div>
   </mat-card-content>
 
 </mat-card>

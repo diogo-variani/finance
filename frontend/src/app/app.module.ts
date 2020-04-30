@@ -35,6 +35,8 @@ import { ServerErrorInterceptor } from './error-handlers/server-error.intercepto
 import { LoginComponent } from './components/login/login.component';
 import { JwtInterceptor } from './helpers/jwt.interceptor';
 
+import { TreeGridModule, RowDDService, SortService, FilterService, ColumnMenuService } from '@syncfusion/ej2-angular-treegrid';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -65,7 +67,8 @@ import { JwtInterceptor } from './helpers/jwt.interceptor';
     FlexLayoutModule,
     MaterialModule,
     ReactiveFormsModule,
-    NgxCurrencyModule /*,
+    NgxCurrencyModule,
+    TreeGridModule /*,
     environment.production ? [] : HttpClientInMemoryWebApiModule.forRoot(FinanceBackendService)*/
     
   ],
@@ -80,7 +83,11 @@ import { JwtInterceptor } from './helpers/jwt.interceptor';
     {provide: MAT_SNACK_BAR_DEFAULT_OPTIONS, useValue: {duration: 2000, horizontalPosition: 'center'}},
     { provide: ErrorHandler, useClass: GlobalErrorHandler },
     { provide: HTTP_INTERCEPTORS, useClass: ServerErrorInterceptor, multi: true },
-    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true }
+    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
+    SortService,
+    FilterService,
+    ColumnMenuService,
+    RowDDService
   ],
   bootstrap: [AppComponent]
 })
